@@ -1,0 +1,46 @@
+﻿@model IEnumerable<ASPNETWebApp48.Models.ActivityLog>
+@using Microsoft.AspNet.Identity
+@using System.Globalization
+
+@if (User.IsInRole("wrhmgr") || User.IsInRole("salesmgr") || User.IsInRole("purchmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+@if (User.IsInRole("admin"))
+{
+    ViewBag.Title = "Activity Logs";
+
+    <div class="container-fluid">
+
+        <h2 class="text-center">@ViewBag.Title</h2>
+        <div class="table-responsive">
+            <table class="table table-hover text-nowrap table-bordered table-sm" id="myTable">
+                <thead>
+                    <tr>
+                        <th class="text-center">#</th>
+                        <th class="text-center">Username</th>
+                        <th class="text-center">Activity</th>
+                        <th class="text-center">Action</th>
+                        <th class="text-center">Date Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var count = 0;
+                    }
+                    @foreach (var item in Model)
+                    {
+                        count += 1;
+                        <tr>
+                            <td class="text-center">@count</td>
+                            <td class="text-center">@Html.DisplayFor(modelItem => item.Username)</td>
+                            <td class="text-center">@Html.DisplayFor(modelItem => item.Activity)</td>
+                            <td class="text-center">@Html.DisplayFor(modelItem => item.Action)</td>
+                            <td class="text-center">@Html.DisplayFor(modelItem => item.DateTime)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

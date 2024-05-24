@@ -1,0 +1,67 @@
+﻿@model ASPNETWebApp48.Models.Supplier
+
+@if (User.IsInRole("wrhmgr") || User.IsInRole("salesmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+
+@if (User.IsInRole("purchmgr") || User.IsInRole("admin"))
+{
+    ViewBag.Title = "Edit Supplier - " + Model.Name;
+
+    <div class="container-fluid">
+        <h2 class="col-12 col-md-6">@ViewBag.Title</h2>
+        <form action="/Supplier/Edit" method="post" enctype="multipart/form-data" class="form-horizontal mt-3 zoom-3">
+            @Html.AntiForgeryToken()
+            <!-- Text input-->
+            <div class="form-group row">
+                <label for="ProductId" class="col-sm-2 col-form-label text-center">Name: </label>
+                <div class="col-sm-10">
+                    <input type="hidden" name="Id" value="@Model.Id" id="Id">
+                    <input id="Name" name="Name" type="text" value="@Model.Name" class="form-control" pattern="[A-Za-z ]+" title="Only Text allowed" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="Address" class="col-sm-2 col-form-label text-center">Address: </label>
+                <div class="col-sm-10">
+                    <textarea id="Address" name="Address" rows="3" class="form-control" title="Please enter a valid address" required>@Model.Address</textarea>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="PhoneNo" class="col-sm-2 col-form-label text-center">Phone Number: </label>
+                <div class="col-sm-10">
+                    <input id="PhoneNo" name="PhoneNo" type="text" value="@Model.PhoneNo" class="form-control" pattern="[0-9]+" title="Only numbers allowed" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="Email" class="col-sm-2 col-form-label text-center">Email: </label>
+                <div class="col-sm-10">
+                    <input id="Email" name="Email" type="email" value="@Model.Email" class="form-control" required>
+                    <input type="hidden" id="Status" name="Status" value="@Model.Status" readonly>
+                </div>
+            </div>
+
+            <!-- Button -->
+            <div class="form-group row">
+                <label class="col-sm-2"></label>
+                <div class="col-sm-10">
+                    <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                    <a href="/Supplier/manage" class="btn btn-secondary btn-lg">Cancel</a>
+                </div>
+            </div>
+
+        </form>
+    </div>
+}
+
+<script>
+    document.getElementById('Address').addEventListener('input', function () {
+        var regex = /^[A-Za-z0-9\s\-.,'#()]+$/;
+        var textareaValue = this.value;
+        if (!regex.test(textareaValue)) {
+            this.setCustomValidity('Please enter a valid address.');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+</script>

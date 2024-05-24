@@ -1,0 +1,169 @@
+﻿@model Dictionary<string, object>
+
+<button type="button" id="btnAddModal1" class="btn btn-primary btn-circle btn-lg" data-toggle="modal" data-target="#addModal">+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="addModal" data-backdrop="static" data-keyboard="false" aria-labelledby="addModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <form action="/Product/Create" method="post" enctype="multipart/form-data" class="form-horizontal">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Product</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    <!-- Text input-->
+                    <div class="form-group row">
+                        <label for="Name" class="col-md-2 col-form-label">Name</label>
+                        <div class="col-md-10">
+                            <input id="Name" name="Name" type="text" class="form-control" pattern="^[a-zA-Z0-9\s]+$" title="Only Name allowed" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <select id="BrandId" name="BrandId" class="form-control" autofocus required>
+                                <option value="" selected disabled>Select Brand</option>
+                                @foreach (var brand in Model["BrandLookup"] as List<Brand>)
+                                {
+                                    <option value="@brand.Id">@brand.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="SKU" class="col-md-2 col-form-label">SKU</label>
+                        <div class="col-md-10">
+                            <input id="SKU" name="SKU" type="text" class="form-control" pattern="[a-zA-Z0-9]+" title="Only SKU allowed" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <select id="CategoryId" name="CategoryId" class="form-control" autofocus required>
+                                <option value="" selected disabled>Select Category</option>
+                                @foreach (var category in Model["CategoryLookup"] as List<Category>)
+                                {
+                                    <option value="@category.Id">@category.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-2 col-form-label">Suplier</label>
+                        <div class="col-md-10">
+                            <select id="SupplierId" name="SupplierId" class="form-control" multiple required>
+                                <option value="" disabled>Select Supplier</option>
+                                @foreach (var supplier in Model["SupplierLookup"] as List<Supplier>)
+                                {
+                                    <option value="@supplier.Id">@supplier.Name</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="PurchasePrice" class="col-md-4 col-form-label">Purchase Price</label>
+                        <div class="col-md-8">
+                            <input v-model="PurchasePrice" id="PurchasePrice" name="PurchasePrice" type="text" class="form-control" min="5" pattern="[0-9.]+" title="Only price allowed" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="SellingPrice" class="col-md-4 col-form-label">Selling Price</label>
+                        <div class="col-md-8">
+                            <input v-model="SellingPrice" id="SellingPrice" name="SellingPrice" type="text" class="form-control" min="5" pattern="[0-9.]+" title="Only price allowed" required>
+                            @*<span v-if="SellingPrice && btnDisabled" id="SellingPriceHelpBlock" class="form-text text-danger">Price not match</span>
+                <span v-else class="form-text">&nbsp;</span>*@
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-md-12">
+                            <select id="Unit" name="Unit" class="form-control" required="required">
+                                <option value="" selected disabled>Select Unit</option>
+                                <option value="Length">Length</option>
+                                <option value="Sheet">Sheet</option>
+                                <option value="Kilo">Kilo</option>
+                                <option value="Set">Set</option>
+                                <option value="Piece">Piece</option>
+                                <option value="Can">Can</option>
+                                <option value="Meter">Meter</option>
+                                <option value="Box">Box</option>
+                                <option value="Bag">Bag</option>
+                                <option value="Gallon">Gallon</option>
+                                <option value="Liter">Liter</option>
+                                <option value="Bottle">Bottle</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="MinQty" class="col-md-4 col-form-label">Min Qty</label>
+                        <div class="col-md-8">
+                            <input id="MinQty" name="MinQty" type="text" class="form-control" min="5" pattern="[0-9.]+" title="Only qty allowed" required>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="CeilingQty" class="col-md-4 col-form-label">Ceiling Qty</label>
+                        <div class="col-md-8">
+                            <input id="CeilingQty" name="CeilingQty" type="text" class="form-control" min="5" pattern="[0-9.]+" title="Only qty allowed" required>
+                        </div>
+                    </div>
+                    <!-- File Upload -->
+                    <div class="form-group row">
+                        <label for="fileUpload" class="col-md-4 col-form-label">Upload Photo</label>
+                        <div class="col-md-8">
+                            <input type="file" accept="image/*" id="fileUpload" name="fileUpload" class="form-control input-md" style="padding:.2rem .2rem;">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" :disabled="btnDisabled">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="/Content/Util/slimselect.min.css" />
+<script type="module">
+    import SlimSelect from '/Scripts/Util/slimselect.es.min.js'
+    new SlimSelect({
+        select: '#BrandId',
+        settings: { searchPlaceholder: 'Search for the Brand!' }
+    });
+    new SlimSelect({
+        select: '#CategoryId',
+        settings: { searchPlaceholder: 'Search for the Category!' }
+    });
+    new SlimSelect({
+        select: '#SupplierId',
+        settings: { searchPlaceholder: 'Search for the Supplier!' },
+    });
+    new SlimSelect({
+        select: '#Unit',
+        settings: { searchPlaceholder: 'Search for the Unit!' }
+    });
+</script>
+
+<style>
+    select[required] {
+        display: block !important;
+        position: absolute;
+        clip: rect(0, 0, 0, 0);
+        pointer-events: none;
+    }
+</style>
+
+<script type="module">
+    import { createApp } from "/Scripts/petite-vue.es.js";
+    const app = {
+        //data
+        PurchasePrice: '',
+        SellingPrice: '',
+        //methods
+        get btnDisabled() {
+            return !this.PurchasePrice || (this.SellingPrice <= this.PurchasePrice);
+        }
+    }
+    createApp(app).mount();
+</script>

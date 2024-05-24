@@ -1,0 +1,92 @@
+﻿@model ASPNETWebApp48.Models.PurchaseReturn
+@using System.Globalization
+
+@if (User.IsInRole("wrhmgr") || User.IsInRole("salesmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+
+@if (User.IsInRole("purchmgr") || User.IsInRole("admin"))
+{
+    ViewBag.Title = "Edit PO Return - " + @Model.Supplier.Name;
+
+    <div class="container-fluid">
+        <div class="card" style="margin-bottom: 20px">
+            <div class="card-body">
+                <h2 class="text-center">@ViewBag.Title</h2><hr />
+                <form method="POST" action="/PurchaseReturn/EditDetail">
+                    @Html.AntiForgeryToken()
+                    <div class="row">
+                        <div class="col-md-2">
+                            <div class="mb-2">
+                                <label for="SupplierId">Supplier</label>
+                                <input type="hidden" name="Id" value="@Model.Id" id="Id">
+                                <input type="hidden" name="PurchaseId" value="@Model.PurchaseId" id="PurchaseId">
+                                <input type="hidden" name="SupplierId" value="@Model.SupplierId" id="SupplierId">
+                                <input type="text" value="@Model.Supplier.Name" readonly>
+                                <input type="hidden" name="Status" value="@Model.Status" id="Status">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="mb-2">
+                                <label for="ReturnDate">Return Date</label>
+                                <input type="text" name="ReturnDate" class="form-control" value="@Model.ReturnDate.ToString("yyyy-MM-dd")" id="ReturnDate" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <label for="Reason" class="col-4 col-form-label">Reason</label>
+                            <textarea id="Reason" name="Reason" cols="40" rows="4" class="form-control" placeholder="Your Reason">@Model.Reason</textarea>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-2">
+                                <center>
+                                    <br />
+                                    <button name="submit" type="submit" class="btn btn-primary btn-md">Save</button>
+                                    <a href="/PurchaseReturn/Cancel" class="btn btn-secondary btn-md">Cancel</a>
+                                </center>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <br /><h3 class="text-center">Returned Items</h3>
+                <div class="table-responsive">
+                    <table class="table table-hover text-nowrap table-bordered table-sm">
+                        <thead class="thead-light">
+                            <tr>
+                                <th class="text-center">Action</th>
+                                <th class="text-center">Product</th>
+                                <th class="text-center">Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var groupedItems = Model.PurchaseReturnItems.GroupBy(pi => pi.ProductId);
+                            }
+
+                            @foreach (var group in groupedItems)
+                            {
+                                var firstItem = group.First();
+                                CultureInfo culture = new CultureInfo("en-PH");
+                                <tr>
+                                    <td class="text-center">
+                                        <a href="/PurchaseReturn/DelItem/@firstItem.Id" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')" title="Delete" style="height: 25px;line-height: 1.0;">&times;</a>
+                                    </td>
+                                    <td class="text-center">@firstItem.Product.Name</td>
+                                    <td class="text-center">@group.Sum(pi => pi.Quantity)</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td class="text-center">
+                                    @Html.Partial("_AddItem", ViewBag.ForAddItemPartial as Dictionary<string, object>)
+                                </td>
+                                <td colspan="2"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+}

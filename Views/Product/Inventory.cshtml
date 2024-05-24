@@ -1,0 +1,46 @@
+﻿@using System.Globalization
+@model List<ASPNETWebApp48.Models.Product>
+
+@if (User.IsInRole("wrhmgr") || User.IsInRole("admin") || User.IsInRole("purchmgr") || User.IsInRole("salesmgr"))
+{
+    ViewBag.Title = "Product Inventory (Main Store)";
+
+    <div class="container-fluid">
+        <p class="float-right">
+            <a class="btn btn-danger" href="/Product/Print">Inventory Report Pdf</a>
+        </p>
+        <h2 class="text-center">@ViewBag.Title</h2>
+        <div class="table-responsive">
+            <table class="table table-hover text-nowrap table-bordered table-sm" id="myTable">
+                <thead>
+                    <tr>
+                        <th class="text-center">Product Name</th>
+                        <th class="text-center">Unit</th>
+                        <th class="text-center">Purchase Price</th>
+                        <th class="text-center">Selling Price</th>
+                        <th class="text-center">Stock In</th>
+                        <th class="text-center">Stock Out</th>
+                        <th class="text-center">Return</th>
+                        <th class="text-center">Current Stock</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model)
+                    {
+                        CultureInfo culture = new CultureInfo("en-PH");
+                        <tr>
+                            <td class="text-center">@product.Name</td>
+                            <td class="text-center">@product.Unit</td>
+                            <td class="text-center">@product.PurchasePrice.ToString("C", culture)</td>
+                            <td class="text-center">@product.SellingPrice.ToString("C", culture)</td>
+                            <td class="text-center">@product.TotalReceive</td>
+                            <td class="text-center">@product.TotalOrder</td>
+                            <td class="text-center">@product.TotalReturn</td>
+                            <td class="text-center">@product.StockOnHand</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

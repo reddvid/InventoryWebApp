@@ -1,0 +1,49 @@
+﻿@model List<ASPNETWebApp48.Models.WarehouseRestockApprove>
+
+@if (User.IsInRole("wrhmgr") || User.IsInRole("salesmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+
+@if (User.IsInRole("purchmgr") || User.IsInRole("admin"))
+{
+    ViewBag.Title = "Product Request | Warehouse Approved";
+
+    <div class="container-fluid">
+        <h2 class="text-center">@ViewBag.Title</h2>
+        <div class="dropdown" style="margin-bottom: 10px;">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Select Product Request
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="/Restock/Manage">Request Approval</a>
+                <a class="dropdown-item" href="/Restock/ManageApproved">Main Store Approved</a>
+                <a class="dropdown-item" href="/Restock/ManageReject">Main Store Reject</a>
+                <a class="dropdown-item" href="/Restock/ManageWarehouseReject">Warehouse Reject</a>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover text-nowrap table-bordered" id="myTable">
+                <thead>
+                    <tr>
+                        <th class="text-center">Product</th>
+                        <th class="text-center">Quantity</th>
+                        <th class="text-center">Approved Date</th>
+                        <th class="text-center">Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var approved in Model)
+                    {
+                        <tr>
+                            <td class="text-center">@approved.ProductWarehouse.Name</td>
+                            <td class="text-center">@approved.Quantity</td>
+                            <td class="text-center">@approved.ApproveDate.ToString("dd-MMM-yyyy")</td>
+                            <td class="text-center">@approved.Notes</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

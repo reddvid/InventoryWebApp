@@ -1,0 +1,72 @@
+﻿@model List<ASPNETWebApp48.Models.TransferDetail>
+
+@if (User.IsInRole("purchmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+@if (User.IsInRole("salesmgr") || User.IsInRole("admin") || User.IsInRole("wrhmgr"))
+{
+    ViewBag.Title = "Manage Stock Transfer";
+
+    <div class="container-fluid">
+        <p class="float-right">
+            @Html.Partial("_Create", ViewBag.ForCreatePartial as Dictionary<string, object>)
+        </p>
+        <br />
+        <h3 class="text-center">@ViewBag.Title</h3>
+        <div class="table-responsive">
+            <table class="table table-hover text-nowrap table-bordered table-sm" id="myTable">
+                <thead>
+                    <tr>
+                        <th class="text-center">Id</th>
+                        <th class="text-center">Transfer Date</th>
+                        <th class="text-center">Source</th>
+                        <th class="text-center">Destination</th>
+                        <th class="text-center">Notes</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model)
+                    {
+                    <tr>
+                        <td class="text-center">@product.Id</td>
+                        <td class="text-center">@product.TransferDate.ToString("dd-MMM-yyyy")</td>
+                        <td class="text-center">@product.Locations.Name</td>
+                        @if (product.LocationId == 1)
+                        {
+                            <td class="text-center">Warehouse</td>
+                        }
+                        @if (product.LocationId == 2)
+                        {
+                            <td class="text-center">Main Store</td>
+                        }
+                        <td class="text-center">@product.Notes</td>
+                        <td class="text-center">@product.Status</td>
+                        <td class="text-center">
+                            @if (product.Status == "Not Transfer")
+                            {
+                                if (product.LocationId == 1)
+                                {
+                                    <a href="/Transfer/Get/@product.Id" class="btn btn-warning btn-sm">Edit</a>
+                                    <a href="/Transfer/Print/@product.Id" class="btn btn-info btn-sm">Print</a>
+                                }
+                                if (product.LocationId == 2)
+                                {
+                                    <a href="/Transfer/GetWh/@product.Id" class="btn btn-warning btn-sm">Edit</a>
+                                    <a href="/Transfer/Print/@product.Id" class="btn btn-info btn-sm">Print</a>
+                                }
+                            }
+                            @if (product.Status == "Transfered")
+                            {
+                                <a href="/Transfer/Print/@product.Id" class="btn btn-info btn-sm">Print</a>
+                            }
+                        </td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

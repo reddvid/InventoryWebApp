@@ -1,0 +1,126 @@
+﻿@using CaptchaMvc.HtmlHelpers
+@{ 
+    ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+}
+
+<div class="brand">
+    <img src="https://www.svgrepo.com/show/483464/person.svg">
+</div>
+<div class="card fat">
+    <div class="card-body">
+        <center>
+            <h4 class="card-title">Jimar Construction Supply Co.</h4>
+            Sign in to start your session
+        </center>
+        <form action="/account/Login" method="post">
+            @Html.AntiForgeryToken()
+            @Html.Hidden("ReturnUrl", (string)ViewBag.ReturnUrl)
+            <div class="form-group">
+                @{ 
+                    bool maxAttempt = false;
+                    bool numAttemps = false;
+                    if (Session["LoginFailureCount"] != null && !string.IsNullOrEmpty(Session["LoginFailureCount"].ToString()))
+                    {
+                        numAttemps = true;
+                        int loginFailureCount = Convert.ToInt32(Session["LoginFailureCount"]);
+                        <p class="text-center">Login Attempt/s: @loginFailureCount</p> 
+                        if (loginFailureCount == 3)
+                        {
+                            maxAttempt = true;
+                            <p class="text-center">Too many failed attempts. @Session["LoginFailureTime"]</p> @*<p>@Session["TimeRemaining"]</p>*@ 
+                        }
+                    } 
+                }
+                <label for="username" class="col-form-label col-form-label-lg-mobile"> Username </label>
+                <input type="text" id="username" name="username" class="form-control form-control-lg-mobile" pattern="^[a-zA-Z0-9_]+$" title="Only username allowed" required autofocus />
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="col-form-label col-form-label-lg-mobile"> Password </label>
+                <input type="password" id="password" name="password" class="form-control form-control-lg-mobile" pattern="^[a-zA-Z0-9!#$%*&.]+$" title="Only password allowed" required data-eye />
+            </div>
+
+            <center>
+                @Html.Captcha(4)
+            </center>
+
+            <div class="form-group">
+                <div class="custom-checkbox custom-control" style="display: flex; align-items: center;">
+                    @*<input type="checkbox" name="rememberme" id="rememberme" class="custom-control-input" value="rememberme" />
+                    <label for="rememberme" class="custom-control-label">Remember Me</label>*@
+                    <label class="custom-label mt-2">@*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*@<a href="/Account/Forgot">Forgot Password</a></label>
+                </div>
+            </div>
+
+            <div class="form-group m-0">
+                <button type="submit" id="loginButton" class="btn btn-primary btn-block btn-lg-mobile">Login</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        var maxAttempt = @maxAttempt.ToString().ToLower();
+        var numAttemps = @numAttemps.ToString().ToLower();
+        if (numAttemps) {
+            document.getElementById('username').style.border = '1px solid red';
+            document.getElementById('password').style.border = '1px solid red';
+        }
+        if (maxAttempt) {
+            document.getElementById("loginButton").disabled = true;
+
+            var failureTime = new Date("@Session["LoginFailureTime"]");
+            var currentTime = new Date();
+            var elapsedTimeInSeconds = Math.floor((currentTime - failureTime) / 1000);
+            var countdownSeconds = 300 - elapsedTimeInSeconds;
+
+            if (countdownSeconds > 0) {
+                var countdownElement = document.createElement("p");
+                countdownElement.id = "countdownTimer";
+                document.querySelector(".card-body").appendChild(countdownElement);
+
+                var countdownInterval = setInterval(function () {
+                    var minutes = Math.floor(countdownSeconds / 60);
+                    var seconds = countdownSeconds % 60;
+                    document.getElementById("countdownTimer").innerText = "Re-enable in: " + minutes + "m " + seconds + "s";
+                    countdownSeconds--;
+
+                    if (countdownSeconds < 0) {
+                        clearInterval(countdownInterval);
+                        document.getElementById("loginButton").disabled = false;
+                        document.getElementById("countdownTimer").innerText = "";
+                        document.getElementById('username').style.border = '';
+                        document.getElementById('password').style.border = '';
+                    }
+                }, 1000);
+            } else {
+                document.getElementById("loginButton").disabled = false;
+            }
+        }
+    </script>
+}
+
+<script>
+    document.getElementById('CaptchaInputText').addEventListener('input', function () {
+        var regex = /^[A-Za-z]+$/; // Modified regex to allow both uppercase and lowercase letters
+        var textareaValue = this.value;
+        if (!regex.test(textareaValue)) {
+            this.setCustomValidity('Only letters are allowed.');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+</script>
+
+<style>
+    #CaptchaInputText {
+        width: 200px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        outline: none;
+        transition: border-color 0.3s;
+    }
+</style>

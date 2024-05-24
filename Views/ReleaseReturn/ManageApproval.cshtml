@@ -1,0 +1,62 @@
+﻿@model List<ASPNETWebApp48.Models.ReleaseReturn>
+
+@if (User.IsInRole("wrhmgr") || User.IsInRole("purchmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+
+@if (User.IsInRole("admin") || User.IsInRole("salesmgr"))
+{
+    ViewBag.Title = "Manage Releasing Return Approval";
+
+    <div class="container-fluid">
+        <p class="float-right">
+            <a class="btn btn-secondary" href="/ReleaseReturn/Manage">Back</a>
+        </p>
+        <h2 class="text-center">@ViewBag.Title</h2>
+        <div class="table-responsive">
+            <table class="table table-hover text-nowrap table-bordered" id="myTable">
+                <thead>
+                    <tr>
+                        <th class="text-center">Client Name</th>
+                        <th class="text-center">Return Date</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Reason</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var returns in Model)
+                    {
+                        <tr>
+                            <td class="text-center">@returns.Releasing.ClientName</td>
+                            <td class="text-center">@returns.ReturnDate.ToString("dd-MMM-yyyy")</td>
+                            <td class="text-center">@returns.Status</td>
+                            <td class="text-center">@returns.Reason</td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center">
+                                    <form action="/ReleaseReturn/Approve" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="Id" value="@returns.Id" />
+                                        <input type="hidden" id="ApproveDate" name="ApproveDate" value="@ViewBag.ApproveDate.ToString("yyyy-MM-dd")">
+                                        <div class="btn-group" role="group">
+                                            <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                        </div>
+                                    </form>&nbsp;
+                                    <form action="/ReleaseReturn/Reject" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="Id" value="@returns.Id" />
+                                        <input type="hidden" id="RejectDate" name="RejectDate" value="@ViewBag.RejectDate.ToString("yyyy-MM-dd")">
+                                        <div class="btn-group" role="group">
+                                            <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

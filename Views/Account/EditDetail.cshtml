@@ -1,0 +1,13 @@
+﻿@{
+    ViewBag.Title = "EditDetail";
+}
+
+<div class="container-fluid">
+    <h2>Edit Detail</h2>
+    @foreach (var user in Model)
+    {
+        @user.UserName
+        @user.Email
+    }
+</div>
+

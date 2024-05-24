@@ -1,0 +1,102 @@
+﻿@model ASPNETWebApp48.Models.Purchase
+@using System.Globalization
+@{
+    ViewBag.Title = "Print - " + @Model.Supplier.Name;
+    Layout = "~/Views/Shared/_PdfLayout.cshtml";
+}
+
+<h3>JIMAR CONSTRUCTION SUPPLY CO., LTD. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Purchase Order</strong></h3>
+111-113 Gomez St. Cagayan De Oro City<br />
+Tel. Nos. (08822) 72-60-25, 72-31-44, 72-32-96 Fax 72-38-84
+<br /><br />
+
+<div class="div1">
+    <h5 class="text-right">Order Date: @Model.OrderDate.ToString("yyyy-MM-dd")</h5>
+</div>
+<div class="div2"><h5>Supplier: @Model.Supplier.Name</h5></div>
+<h5>PO #: @Model.Id</h5><br />
+
+<table class="table table-bordered table-sm">
+    <thead class="thead-light">
+        <tr>
+            <th class="text-center">Product</th>
+            <th class="text-center">Brand</th>
+            <th class="text-center">Quantity</th>
+            <th class="text-center">Unit</th>
+            <th class="text-center">Purchase Price</th>
+            <th class="text-center">Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        @{
+            // Group PurchaseItems by ProductId
+            var groupedItems = Model.PurchaseItems.GroupBy(pi => pi.ProductId);
+        }
+
+        @foreach (var group in groupedItems)
+        {
+            // Take the first item in the group to access product information
+            var firstItem = group.First();
+            CultureInfo culture = new CultureInfo("en-PH");
+            <tr>
+                <td class="text-center">@firstItem.ProductSupplier.Product.Name</td>
+                <td class="text-center">@firstItem.ProductSupplier.Product.Brand.Name</td>
+                <td class="text-center">@group.Sum(pi => pi.Quantity)</td>
+                <td class="text-center">@firstItem.ProductSupplier.Product.Unit</td>
+                <td class="text-center">@firstItem.PurchasePrice.ToString("C", culture)</td>
+                <td class="text-center">@group.Sum(pi => pi.Amount).ToString("C", culture)</td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="5" class="text-right">
+                <strong>Total:</strong>
+            </td>
+            <td class="text-center">
+                <strong>₱@Model.OrderTotal.ToString("N2")</strong>
+            </td>
+        </tr>
+    </tfoot>
+</table>
+
+<div class="div1">
+    <div class="signature">
+        <br /><br /><p>________________________</p><br />
+        <p>Approved By</p>
+    </div>
+</div>
+<div class="div2">
+    <div class="signature">
+        <br /><br /><p>________________________</p><br />
+        <p>Received By</p>
+    </div>
+</div>
+
+<style>
+    /* Style for the container */
+    .signature-container {
+        display: flex;
+        justify-content: space-between; /* Distribute space between items */
+        align-items: center; /* Align items vertically */
+    }
+
+    /* Style for the signature blocks */
+    .signature {
+        text-align: center;
+    }
+
+    .signature p {
+        margin: 0; /* Style for the labels */
+    }
+
+    .div1{
+        width: 50%;
+        float: right;
+    }
+
+    .div2 {
+        width: 50%;
+        float: left;
+    }
+</style>

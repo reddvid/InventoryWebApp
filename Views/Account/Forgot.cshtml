@@ -1,0 +1,57 @@
+﻿@using CaptchaMvc.HtmlHelpers
+@{ 
+    ViewBag.Title = "Forgot Password";
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+}
+
+<div class="brand">
+    <img src="https://www.svgrepo.com/show/483464/person.svg">
+</div>
+<div class="card fat">
+    <div class="card-body">
+        <h4 class="card-title text-center">@ViewBag.Title</h4>
+        <form action="/account/Forgot" method="post">
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <label for="username" class="col-form-label col-form-label-lg-mobile"> Username </label>
+                <input type="text" id="username" name="username" class="form-control form-control-lg-mobile" pattern="^[a-zA-Z0-9_]+$" title="Only username allowed" required autofocus />
+            </div>
+
+            <center>
+                @Html.MathCaptcha()
+            </center>
+            <br />
+
+            <div class="form-group m-0">
+                <button type="submit" class="btn btn-primary btn-block btn-lg-mobile"> Submit </button>
+            </div>
+
+            <div class="mt-4 text-center">
+                Already account? <a href="/account/login">Login</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById('CaptchaInputText').addEventListener('input', function () {
+        var regex = /^[0-9]+$/; // Corrected regex syntax
+        var textareaValue = this.value;
+        if (!regex.test(textareaValue)) {
+            this.setCustomValidity('Only numbers are allowed.');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+</script>
+
+<style>
+    #CaptchaInputText {
+        width: 200px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        outline: none;
+        transition: border-color 0.3s;
+    }
+</style>

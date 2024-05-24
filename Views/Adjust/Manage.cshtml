@@ -1,0 +1,51 @@
+﻿@model List<ASPNETWebApp48.Models.Adjustment>
+@using System.Globalization
+
+@if (User.IsInRole("wrhmgr") || User.IsInRole("salesmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+@if (User.IsInRole("purchmgr") || User.IsInRole("admin"))
+{
+    ViewBag.Title = "Manage Adjustment";
+
+    <div class="container-fluid">
+        <p class="float-right">
+            @Html.Partial("_Create", ViewBag.ForCreatePartial as Dictionary<string, object>)
+        </p>
+        <br />
+        <h3 class="text-center">@ViewBag.Title</h3>
+        <div class="table-responsive">
+            <table class="table table-hover text-nowrap table-bordered table-sm" id="myTable">
+                <thead>
+                    <tr>
+                        <th class="text-center">Id</th>
+                        <th class="text-center">Adjust Date</th>
+                        <th class="text-center">Location</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model)
+                    {
+                        <tr>
+                            <td class="text-center">@product.Id</td>
+                            <td class="text-center">@product.AdjustmentDate.ToString("dd-MMM-yyyy")</td>
+                            <td class="text-center">@product.Locations.Name</td>
+                            <td class="text-center">
+                                @if (product.LocationId == 1)
+                                {
+                                    <a href="/Adjust/Get/@product.Id" class="btn btn-warning btn-sm">Edit</a>
+                                }
+                                @if (product.LocationId == 2)
+                                {
+                                    <a href="/Adjust/GetWh/@product.Id" class="btn btn-warning btn-sm">Edit</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

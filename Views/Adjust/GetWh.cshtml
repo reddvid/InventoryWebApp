@@ -1,0 +1,83 @@
+﻿@model ASPNETWebApp48.Models.Adjustment
+@using System.Globalization
+@if (User.IsInRole("wrhmgr") || User.IsInRole("salesmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+
+@if (User.IsInRole("admin") || User.IsInRole("purchmgr"))
+{
+    ViewBag.Title = "Adjust Detail";
+
+    <div class="container-fluid">
+        <div class="card" style="margin-bottom: 20px">
+            <div class="card-body">
+                <h2 class="text-center">@ViewBag.Title - Warehouse</h2><hr />
+                <form method="POST" action="/Adjust/EditDetail">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-2">
+                                <label for="">Location</label>
+                                <input type="hidden" name="Id" value="@Model.Id" id="Id">
+                                <select id="LocationId" name="LocationId" class="form-control" required="required">
+                                    <option value="@Model.LocationId" selected>Selected - @Model.Locations.Name</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-2">
+                                <label for="AdjustmentDate">Adjust Date</label>
+                                <input type="date" name="AdjustmentDate" class="form-control" value="@Model.AdjustmentDate.ToString("yyyy-MM-dd")" id="AdjustmentDate" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <center>
+                                <br />
+                                <button name="submit" type="submit" class="btn btn-primary btn-md">Submit</button>
+                                <a href="/Adjust/Cancel" class="btn btn-secondary btn-md">Cancel</a>
+                            </center>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <h3 class="text-center">Adjustment Items</h3>
+        <table class="table table-hover text-nowrap table-bordered table-sm">
+            <thead class="thead-light">
+                <tr>
+                    <th class="text-center">Action</th>
+                    <th class="text-center">Product</th>
+                    <th class="text-center">Add</th>
+                    <th class="text-center">Deduct</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    // Group PurchaseItems by ProductId
+                    var groupedItems = Model.AdjustItems.GroupBy(pi => pi.WarehouseId);
+                }
+                @foreach (var group in groupedItems)
+                {
+                    // Take the first item in the group to access product information
+                    var firstItem = group.First();
+                    CultureInfo culture = new CultureInfo("en-PH");
+                    <tr>
+                        <td class="text-center">
+                            <a href="/Adjust/DelItemWh/@firstItem.Id" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')" title="Delete" style="height: 25px;line-height: 1.0;">&times;</a>
+                        </td>
+                        <td class="text-center">@firstItem.ProductWarehouse.Name</td>
+                        <td class="text-center">@group.Sum(pi => pi.QtyAdd)</td>
+                        <td class="text-center">@group.Sum(pi => pi.QtyDeduct)</td>
+                    </tr>
+                }
+                <tr>
+                    <td class="text-center">
+                        @Html.Partial("_AddItemWh", ViewBag.ForCreatePartial2 as Dictionary<string, object>)
+                    </td>
+                    <td colspan="3"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+}

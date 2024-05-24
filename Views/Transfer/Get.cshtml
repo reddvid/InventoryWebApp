@@ -1,0 +1,81 @@
+﻿@model ASPNETWebApp48.Models.TransferDetail
+
+@if (User.IsInRole("purchmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+
+@if (User.IsInRole("admin") || User.IsInRole("wrhmgr") || User.IsInRole("salesmgr"))
+{
+    ViewBag.Title = "Transfer Detail || Main to Warehouse";
+
+    <div class="container-fluid">
+        <div class="card" style="margin-bottom: 20px">
+            <div class="card-body">
+                <h2 class="text-center">@ViewBag.Title</h2><hr />
+                <form method="POST" action="/Transfer/EditDetail">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="">Source Location</label>
+                            <input type="hidden" name="Id" value="@Model.Id" id="Id">
+                            <input id="Status" name="Status" value="Transfered" type="hidden">
+                            <select id="LocationId" name="LocationId" class="form-control" required="required">
+                                <option value="@Model.LocationId" selected>Selected - @Model.Locations.Name</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="TransferDate">Transfer Date</label>
+                            <input type="date" name="TransferDate" class="form-control" value="@Model.TransferDate.ToString("yyyy-MM-dd")" id="TransferDate" readonly>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="Notes">Notes</label>
+                            <textarea id="Notes" name="Notes" rows="3" class="form-control zoom-3">@Model.Notes</textarea>
+                        </div>
+                        <div class="col-md-3">
+                            <center>
+                                <br />
+                                <button name="submit" type="submit" class="btn btn-primary btn-md">Submit</button>
+                                <a href="/Transfer/Cancel" class="btn btn-secondary btn-md">Cancel</a>
+                            </center>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <h3 class="text-center">Transfered Items</h3>
+        <table class="table table-hover text-nowrap table-bordered table-sm">
+            <thead class="thead-light">
+                <tr>
+                    <th class="text-center">Action</th>
+                    <th class="text-center">Product</th>
+                    <th class="text-center">Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    // Group PurchaseItems by ProductId
+                    var groupedItems = Model.TransferItemStores.GroupBy(pi => pi.ProductId);
+                }
+                @foreach (var group in groupedItems)
+                {
+                    // Take the first item in the group to access product information
+                    var firstItem = group.First();
+                    <tr>
+                        <td class="text-center">
+                            <a href="/Transfer/DelItem/@firstItem.Id" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')" title="Delete" style="height: 25px;line-height: 1.0;">&times;</a>
+                        </td>
+                        <td class="text-center">@firstItem.Product.Name</td>
+                        <td class="text-center">@group.Sum(pi => pi.Quantity)</td>
+                    </tr>
+                }
+                <tr>
+                    <td class="text-center">
+                        @Html.Partial("_AddItem", ViewBag.ForCreatePartial as Dictionary<string, object>)
+                    </td>
+                    <td colspan="2"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+}

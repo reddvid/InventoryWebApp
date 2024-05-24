@@ -1,0 +1,44 @@
+﻿@model List<ASPNETWebApp48.Models.ReleaseReturnDmg>
+
+@if (User.IsInRole("wrhmgr") || User.IsInRole("purchmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+
+@if (User.IsInRole("admin") || User.IsInRole("salesmgr"))
+{
+    ViewBag.Title = "Manage Releasing Damage";
+
+    <div class="container-fluid">
+        <p class="float-right">
+            <a class="btn btn-secondary" href="/ReleaseReturn/Manage">Back</a>&nbsp;
+            @*<a href="/ReleaseReturn/CreateDamage" class="float-right btn btn-primary btn-circle btn-lg text-center" style="display: flex; justify-content: center; align-items: center;">+</a>*@
+        </p>
+        <h2 class="text-center">@ViewBag.Title</h2>
+        <div class="table-responsive">
+            <table class="table table-hover text-nowrap table-bordered" id="myTable">
+                <thead>
+                    <tr>
+                        <th class="text-center">Id</th>
+                        <th class="text-center">Customer Name</th>
+                        <th class="text-center">Damage Date</th>
+                        <th class="text-center">Product</th>
+                        <th class="text-center">Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var returns in Model)
+                    {
+                        <tr>
+                            <td class="text-center">@returns.Id</td>
+                            <td class="text-center">@returns.Releasing.LastName,@returns.Releasing.FirstName</td>
+                            <td class="text-center">@returns.ReturnDate.ToString("dd-MMM-yyyy")</td>
+                            <td class="text-center">@returns.Product.Name</td>
+                            <td class="text-center">@returns.Quantity</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

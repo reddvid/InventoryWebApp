@@ -1,0 +1,69 @@
+﻿@model ASPNETWebApp48.Models.Receiving
+@using System.Globalization
+@{
+    ViewBag.Title = "ReceivePrint";
+    //ViewBag.Title = "Print - " + @Model.Supplier.Name;
+    Layout = "~/Views/Shared/_PdfLayout.cshtml";
+}
+
+<h3>JIMAR CONSTRUCTION SUPPLY CO., LTD. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>Receive Detail</strong></h3>
+111-113 Gomez St. Cagayan De Oro City<br />
+Tel. Nos. (08822) 72-60-25, 72-31-44, 72-32-96 Fax 72-38-84
+<br /><br />
+      <h5>
+          Purchase No : @Model.PurchaseId<br />
+          Supplier : @Model.Supplier.Name<br />
+          Location : @Model.Locations.Name<br />
+          Date : @Model.ReceiveDate.ToString("yyyy-MM-dd")<br />
+          Status : @Model.Status
+      </h5>
+
+<h3 class="text-center">Received Items</h3>
+        <div class="table-responsive">
+            <table class="table table-hover text-nowrap table-bordered table-sm">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-center">Product</th>
+                        <th class="text-center">Brand</th>
+                        <th class="text-center">Quantity</th>
+                        <th class="text-center">Unit</th>
+                        <th class="text-center">Purchase Price</th>
+                        <th class="text-center">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        // Group PurchaseItems by ProductId
+                        var groupedItems = Model.ReceivingItems.GroupBy(pi => pi.ProductId);
+                    }
+
+                    @foreach (var group in groupedItems)
+                    {
+                        // Take the first item in the group to access product information
+                        var firstItem = group.First();
+                        CultureInfo culture = new CultureInfo("en-PH");
+                        <tr>
+                            <td class="text-center">@firstItem.ProductSupplier.Product.Name</td>
+                            <td class="text-center">@firstItem.ProductSupplier.Product.Brand.Name</td>
+                            <td class="text-center">@group.Sum(pi => pi.Quantity)</td>
+                            <td class="text-center">@firstItem.ProductSupplier.Product.Unit</td>
+                            <td class="text-center">@firstItem.PurchasePrice.ToString("C", culture)</td>
+                            <td class="text-center">@group.Sum(pi => pi.Amount).ToString("C", culture)</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5" class="text-right">
+                            <strong>Total:</strong>
+                        </td>
+                        <td class="text-center">
+                            <strong>₱@Model.OrderTotal.ToString("N2")</strong>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <h5>
+            Reason : @Model.Reason
+        </h5>

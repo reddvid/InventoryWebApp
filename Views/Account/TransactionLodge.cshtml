@@ -1,0 +1,47 @@
+﻿@model IEnumerable<ASPNETWebApp48.Models.TransactionLodge>
+
+@if (User.IsInRole("wrhmgr") || User.IsInRole("salesmgr") || User.IsInRole("purchmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+@if (User.IsInRole("admin"))
+{
+    ViewBag.Title = "Transaction Lodge";
+
+    <div class="container-fluid">
+        <h2 class="text-center">@ViewBag.Title</h2>
+        <div class="table-responsive">
+            <table class="table table-hover text-nowrap table-bordered table-sm" id="myTable">
+                <thead>
+                    <tr>
+                        <th class="text-center">#</th>
+                        <th class="text-center">Date</th>
+                        <th class="text-center">Activity</th>
+                        <th class="text-center">Quantity</th>
+                        <th class="text-center">Warehouse</th>
+                        <th class="text-center">Store</th>
+                        <th class="text-center">Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        var count = 0;
+                    }
+                    @foreach (var item in Model)
+                    {
+                        count += 1;
+                        <tr>
+                            <td class="text-center">@count</td>
+                            <td class="text-center">@Html.DisplayFor(modelItem => item.Date)</td>
+                            <td class="text-center">@item.Activity</td>
+                            <td class="text-center">@item.Quantity</td>
+                            <td class="text-center">@item.CurrentWarehouseQty</td>
+                            <td class="text-center">@item.CurrentStoreQty</td>
+                            <td class="text-center">@item.Balance</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

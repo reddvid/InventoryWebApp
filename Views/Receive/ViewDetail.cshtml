@@ -1,0 +1,100 @@
+﻿@model ASPNETWebApp48.Models.Receiving
+@using System.Globalization
+
+@if (User.IsInRole("salesmgr") || User.IsInRole("wrhmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+
+@if (User.IsInRole("purchmgr") || User.IsInRole("admin"))
+{
+    ViewBag.Title = "View Detail - " + Model.Supplier.Name;
+
+    <div class="container-fluid">
+        <h2 class="text-center">@ViewBag.Title</h2><hr />
+        <div class="col-12 col-md-6">
+            <h5>
+                Purchase No : @Model.PurchaseId<br />
+                Supplier : @Model.Supplier.Name<br />
+                Location : @Model.Locations.Name<br />
+                Date : @Model.ReceiveDate.ToString("yyyy-MM-dd")<br />
+                Status : @Model.Status
+            </h5>
+        </div>
+        <h3 class="text-center">Received Items</h3>
+        <div class="table-responsive">
+            <table class="table table-hover text-nowrap table-bordered table-sm">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="text-center">Product</th>
+                        <th class="text-center">Brand</th>
+                        <th class="text-center">Quantity</th>
+                        <th class="text-center">Unit</th>
+                        <th class="text-center">Purchase Price</th>
+                        <th class="text-center">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        // Group PurchaseItems by ProductId
+                        var groupedItems = Model.ReceivingItems.GroupBy(pi => pi.ProductId);
+                    }
+
+                    @foreach (var group in groupedItems)
+                    {
+                        // Take the first item in the group to access product information
+                        var firstItem = group.First();
+                        CultureInfo culture = new CultureInfo("en-PH");
+                        <tr>
+                            <td class="text-center">@firstItem.ProductSupplier.Product.Name</td>
+                            <td class="text-center">@firstItem.ProductSupplier.Product.Brand.Name</td>
+                            <td class="text-center">@group.Sum(pi => pi.Quantity)</td>
+                            <td class="text-center">@firstItem.ProductSupplier.Product.Unit</td>
+                            <td class="text-center">@firstItem.PurchasePrice.ToString("C", culture)</td>
+                            <td class="text-center">@group.Sum(pi => pi.Amount).ToString("C", culture)</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5" class="text-right">
+                            <strong>Total:</strong>
+                        </td>
+                        <td class="text-center">
+                            <strong>₱@Model.OrderTotal.ToString("N2")</strong>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="row">
+            <label class="col-7"></label>
+            @*<a href="/Receive/Explain/@Model.Id" class="btn btn-secondary btn-sm">Incomplete</a>*@
+            @*<form  method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Id" value="@Model.Id" />
+                <button type="submit" class="btn btn-secondary btn-sm mr-3" href="/Receive/Explain/@Model.Id">Incomplete</button>
+            </form>*@
+            <form action="/Receive/Approve" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Id" value="@Model.Id" />
+                <button type="submit" class="btn btn-success mr-3">Complete</button>
+            </form>
+            &nbsp;&nbsp;&nbsp;
+            <a href="/Receive/ManageApproval" class="btn btn-secondary">Back</a>
+            @*<a href="/Receive/Explain/@Model.Id" class="btn btn-secondary">Incomplete</a>&nbsp;&nbsp;&nbsp;*@
+            @*<form action="/Receive/Pending" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Id" value="@Model.Id" />
+                <input type="hidden" name="SupplierId" value="@Model.SupplierId" id="SupplierId">
+                <button type="submit" class="btn btn-warning mr-3">Incomplete/Pending</button>
+            </form>*@
+            @*<form action="/Receive/Closed" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="Id" value="@Model.Id" />
+                <input type="hidden" name="SupplierId" value="@Model.SupplierId" id="SupplierId">
+                <button type="submit" class="btn btn-danger mr-3">Closed</button>
+            </form>*@
+        </div>
+    </div>
+}

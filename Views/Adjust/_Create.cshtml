@@ -1,0 +1,57 @@
+﻿@model Dictionary<string, object>
+
+@{
+    var locations = Model["LocLookup"] as List<Location>;
+}
+
+<button type="button" id="btnAddModal1" class="btn btn-primary btn-circle btn-lg" data-toggle="modal" data-target="#addModal">+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="addModal" data-backdrop="static" data-keyboard="false" aria-labelledby="addModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <form action="/Adjust/Create" method="post" enctype="multipart/form-data" class="form-horizontal">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Adjust</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    <!-- Text input-->
+                    <div class="form-group">
+                        <select id="LocationId" name="LocationId" class="form-control" required="required">
+                            <option value="" selected disabled>Select location</option>
+                            @foreach (var location in locations)
+                            {
+                                <option value="@location.Id">@location.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group row">
+                        <label for="AdjustmentDate" class="col-md-4 col-form-label">Adjust Date</label>
+                        <div class="col-md-8">
+                            <input type="date" id="AdjustmentDate" name="AdjustmentDate" value="@ViewBag.AdjustmentDate.ToString("yyyy-MM-dd")" class="form-control" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<link rel="stylesheet" href="/Content/Util/slimselect.min.css" />
+<script src="https://unpkg.com/slim-select@latest/dist/slimselect.min.js"></script>
+<script type="module">
+    import SlimSelect from '/Scripts/Util/slimselect.es.min.js'
+    new SlimSelect({
+        select: '#LocationId',
+        settings: { searchPlaceholder: 'Search for the Location!' }
+    });
+</script>

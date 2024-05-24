@@ -1,0 +1,26 @@
+﻿@{
+    ViewBag.Title = "Verify Code - " + Session["user"];
+    Layout = "~/Views/Shared/_AccountLayout.cshtml";
+}
+
+<div class="brand">
+    <img src="https://www.svgrepo.com/show/483464/person.svg">
+</div>
+<div class="card fat">
+    <div class="card-body">
+        <h4 class="card-title text-center">@ViewBag.Title</h4>
+        <form action="/account/Verify" method="post">
+            @Html.AntiForgeryToken()
+            <div class="form-group">
+                <label for="code" class="col-form-label col-form-label-lg-mobile"> Your Code </label>
+                <input type="text" id="otp" name="otp" class="form-control form-control-lg-mobile" pattern="[0-9]+" title="Only number allowed" required autofocus />
+            </div>
+
+            <br />
+            <div class="form-group m-0">
+                <button type="submit" class="btn btn-primary btn-block btn-lg-mobile"> Submit </button>
+            </div>
+
+        </form>
+    </div>
+</div>

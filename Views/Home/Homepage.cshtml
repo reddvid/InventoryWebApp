@@ -1,0 +1,995 @@
+﻿﻿@using System.Globalization
+@model ASPNETWebApp48.ViewModels.DashboardViewModel
+@using Microsoft.AspNet.Identity
+@using Newtonsoft.Json;
+@{
+    ViewBag.Title = "Welcome, " + @User.Identity.Name;
+}
+<div class="container-fluid">
+    <h3>
+        @if (User.IsInRole("admin"))
+        {
+            <strong>@ViewBag.Title - Steven Teddy Tan</strong>
+        }
+        @if (User.IsInRole("salesmgr"))
+        {
+            <strong>@ViewBag.Title - Releaser Manager</strong>
+        }
+        @if (User.IsInRole("wrhmgr"))
+        {
+            <strong>@ViewBag.Title - Warehouse Manager</strong>
+        }
+        @if (User.IsInRole("purchmgr"))
+        {
+            <strong>@ViewBag.Title - Purchase Manager</strong>
+        }
+    </h3>
+    @if (Request.IsAuthenticated)
+    {
+        <div class="row">
+            @if (User.IsInRole("admin"))
+            {
+                <div class="col-12 col-sm-6 col-md-3 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h4 class="card-title">Total Product</h4>
+                                </div>
+                                <div class="col-auto">
+                                    <!-- Notification Icon with Badge -->
+                                    <a class="nav-link dropdown-toggle p-0" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="material-icons icon" style="margin:0%; color: black;">
+                                            notifications
+                                        </i>
+                                        @if (ViewBag.ProductLookup != null || (ViewBag.title == ""))
+                                        {
+                                            int overallAlertCount = 0;
+
+                                            foreach (var product in ViewBag.ProductLookup ?? Model)
+                                            {
+                                                if (product.StockOnHand <= product.MinQty && product.StockOnHand > 1)
+                                                {
+                                                    overallAlertCount++;
+                                                }
+                                                else if (product.StockOnHand == 0)
+                                                {
+                                                    overallAlertCount++;
+                                                }
+                                            }
+                                            ViewBag.OverallAlertCount = overallAlertCount;
+
+                                            <span class="badge badge-danger badge-counter" style="margin-left:-14px; border-radius:60px;">
+                                                @ViewBag.OverallAlertCount
+                                            </span>
+                                        }
+                                    </a>
+
+                                    <!-- Dropdown - Alerts -->
+                                    <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                         aria-labelledby="alertsDropdown" style="overflow-y: scroll; height:30rem; width:20rem; font-size:15px; color:aqua;">
+                                        <h6 class="dropdown-header">
+                                            Notification
+                                        </h6>
+                                        @if (ViewBag.ProductLookup != null || (ViewBag.title == ""))
+                                        {
+                                            int overallAlertCount = 0;
+
+                                            foreach (var product in ViewBag.ProductLookup ?? Model)
+                                            {
+                                                if (product.StockOnHand <= product.MinQty && product.StockOnHand > 1)
+                                                {
+                                                    overallAlertCount++;
+                                                    <a class="dropdown-item d-flex align-items-center" href="">
+                                                        <div class="mr-3">
+                                                            <i class="material-icons icon" style="color:orange;">
+                                                                warning
+                                                            </i>
+                                                        </div>
+                                                        <div style="display:flex; flex-direction:row;">
+                                                            <p style="white-space: nowrap; text-overflow: ellipsis;">Low Stock for @product.Name</p>
+                                                        </div>
+                                                    </a>
+                                                }
+                                                else if (product.StockOnHand == 0)
+                                                {
+                                                    overallAlertCount++;
+                                                    <a class="dropdown-item d-flex align-items-center" href="">
+                                                        <div class="mr-3">
+                                                            <i class="material-icons icon" style="color:red;">
+                                                                error
+                                                            </i>
+                                                        </div>
+                                                        <div style="display:flex; flex-direction:row;">
+                                                            <p style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">Out of Stock for @product.Name</p>
+                                                        </div>
+                                                    </a>
+                                                }
+                                            }
+                                            ViewBag.OverallAlertCount = overallAlertCount;
+
+                                            if (overallAlertCount == 0)
+                                            {
+                                                <p style="margin-left:10px;" class="text-center">No products found.</p>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <h4 class="card-text">@ViewBag.ProductCount</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h5 class="card-title">Total Product Warehouse</h5>
+                                </div>
+                                <div class="col-auto">
+                                    <!-- Notification Icon with Badge -->
+                                    <a class="nav-link dropdown-toggle p-0" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="material-icons icon" style="margin:0%; color: black;">
+                                            notifications
+                                        </i>
+                                        @if (ViewBag.WarehouseProductLookup != null || (ViewBag.title == ""))
+                                        {
+                                            int overallAlertCount = 0;
+
+                                            foreach (var product in ViewBag.WarehouseProductLookup ?? Model)
+                                            {
+                                                if (product.StockOnHand <= product.MinQty && product.StockOnHand > 1)
+                                                {
+                                                    overallAlertCount++;
+                                                }
+                                                else if (product.StockOnHand == 0)
+                                                {
+                                                    overallAlertCount++;
+                                                }
+                                            }
+                                            ViewBag.OverallAlertCount = overallAlertCount;
+
+                                            <span class="badge badge-danger badge-counter" style="margin-left:-14px; border-radius:60px;">
+                                                @ViewBag.OverallAlertCount
+                                            </span>
+                                        }
+                                    </a>
+
+                                    <!-- Dropdown - Alerts -->
+                                    <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                         aria-labelledby="alertsDropdown" style="overflow-y: scroll; height:30rem; width:20rem; font-size:15px;">
+                                        <h6 class="dropdown-header">
+                                            Notification
+                                        </h6>
+                                        @if (ViewBag.WarehouseProductLookup != null || (ViewBag.title == "Inventory Warehouse"))
+                                        {
+                                            int overallAlertCount = 0;
+
+                                            foreach (var product in ViewBag.WarehouseProductLookup ?? Model)
+                                            {
+                                                if (product.StockOnHand <= product.MinQty && product.StockOnHand > 1)
+                                                {
+                                                    overallAlertCount++;
+                                                    <a class="dropdown-item d-flex align-items-center" href="">
+                                                        <div class="mr-3">
+                                                            <i class="material-icons icon" style="color:orange;">
+                                                                warning
+                                                            </i>
+                                                        </div>
+                                                        <div style="display:flex; flex-direction:row;">
+                                                            <p style="white-space: nowrap; text-overflow: ellipsis;">Low Stock for @product.Name</p>
+                                                        </div>
+                                                    </a>
+                                                }
+                                                else if (product.StockOnHand == 0)
+                                                {
+                                                    overallAlertCount++;
+                                                    <a class="dropdown-item d-flex align-items-center" href="">
+                                                        <div class="mr-3">
+                                                            <i class="material-icons icon" style="color:red;">
+                                                                error
+                                                            </i>
+                                                        </div>
+                                                        <div style="display:flex; flex-direction:row;">
+                                                            <p style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">Out of Stock for @product.Name</p>
+                                                        </div>
+                                                    </a>
+                                                }
+                                            }
+                                            ViewBag.OverallAlertCount = overallAlertCount;
+
+                                            if (overallAlertCount == 0)
+                                            {
+                                                <p class="text-center" style="margin-left:10px;">No products found.</p>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <h4 class="card-text">@ViewBag.productwhCount</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Total Release</h4>
+                            <h4 class="card-text">@ViewBag.ReleaseCount</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Total Purchase</h4>
+                            <h4 class="card-text">@ViewBag.purchaseCount</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Total Release Return</h4>
+                            <h4 class="card-text">@ViewBag.ReleaseReturnCount</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Total Purchase Return</h4>
+                            <h4 class="card-text">@ViewBag.PurchaseReturnCount</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Total Pending Transfer</h4>
+                            <h4 class="card-text">@ViewBag.TransferCount</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Total Supplier</h4>
+                            <h4 class="card-text">@ViewBag.supplierCount</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-12 mt-4 mb-4">
+                    <div class="card">
+                        <h4 style="text-align:center; margin-top:10px;">Order Chart</h4>
+                        <div class="p-3 d-flex align-items-center">
+                            <label for="monthSelectorOrder" class="mr-2">Select Month</label>
+                            <select id="monthSelectorOrder" class="form-control col-md-6" onchange="updateChartOrder()">
+                                <option value="all">All</option>
+                                <option value="0">January</option>
+                                <option value="1">February</option>
+                                <option value="2">March</option>
+                                <option value="3">April</option>
+                                <option value="4">May</option>
+                                <option value="5">June</option>
+                                <option value="6">July</option>
+                                <option value="7">August</option>
+                                <option value="8">September</option>
+                                <option value="9">October</option>
+                                <option value="10">November</option>
+                                <option value="11">December</option>
+                            </select>
+                        </div>
+                        <canvas id="lineChartOrder" style="width:100%;width:800px"></canvas>
+                    </div>
+                </div>
+            }
+            @if (User.IsInRole("purchmgr")) 
+            { 
+                <div class="col-12 col-sm-6 col-md-3 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h4 class="card-title">Total Product</h4>
+                                </div>
+                                <div class="col-auto">
+                                    <!-- Notification Icon with Badge -->
+                                    <a class="nav-link dropdown-toggle p-0" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="material-icons icon" style="margin:0%; color: black;">
+                                            notifications
+                                        </i>
+                                        @if (ViewBag.ProductLookup != null || (ViewBag.title == ""))
+                                        {
+                                            int overallAlertCount = 0;
+
+                                            foreach (var product in ViewBag.ProductLookup ?? Model)
+                                            {
+                                                if (product.StockOnHand <= product.MinQty && product.StockOnHand > 1)
+                                                {
+                                                    overallAlertCount++;
+                                                }
+                                                else if (product.StockOnHand == 0)
+                                                {
+                                                    overallAlertCount++;
+                                                }
+                                            }
+                                            ViewBag.OverallAlertCount = overallAlertCount;
+
+                                            <span class="badge badge-danger badge-counter" style="margin-left:-14px; border-radius:60px;">
+                                                @ViewBag.OverallAlertCount
+                                            </span>
+                                        }
+                                    </a>
+
+                                    <!-- Dropdown - Alerts -->
+                                    <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                         aria-labelledby="alertsDropdown" style="overflow-y: scroll; height:30rem; width:20rem; font-size:15px; color:aqua;">
+                                        <h6 class="dropdown-header">
+                                            Notification
+                                        </h6>
+                                        @if (ViewBag.ProductLookup != null || (ViewBag.title == ""))
+                                        {
+                                            int overallAlertCount = 0;
+
+                                            foreach (var product in ViewBag.ProductLookup ?? Model)
+                                            {
+                                                if (product.StockOnHand <= product.MinQty && product.StockOnHand > 1)
+                                                {
+                                                    overallAlertCount++;
+                                                    <a class="dropdown-item d-flex align-items-center" href="">
+                                                        <div class="mr-3">
+                                                            <i class="material-icons icon" style="color:orange;">
+                                                                warning
+                                                            </i>
+                                                        </div>
+                                                        <div style="display:flex; flex-direction:row;">
+                                                            <p style="white-space: nowrap; text-overflow: ellipsis;">Low Stock for @product.Name</p>
+                                                        </div>
+                                                    </a>
+                                                }
+                                                else if (product.StockOnHand == 0)
+                                                {
+                                                    overallAlertCount++;
+                                                    <a class="dropdown-item d-flex align-items-center" href="">
+                                                        <div class="mr-3">
+                                                            <i class="material-icons icon" style="color:red;">
+                                                                error
+                                                            </i>
+                                                        </div>
+                                                        <div style="display:flex; flex-direction:row;">
+                                                            <p style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">Out of Stock for @product.Name</p>
+                                                        </div>
+                                                    </a>
+                                                }
+                                            }
+                                            ViewBag.OverallAlertCount = overallAlertCount;
+
+                                            if (overallAlertCount == 0)
+                                            {
+                                                <p style="margin-left:10px;" class="text-center">No products found.</p>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <h4 class="card-text">@ViewBag.ProductCount</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Total Purchase</h4>
+                            <h4 class="card-text">@ViewBag.purchaseCount</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Total Purchase Return</h4>
+                            <h4 class="card-text">@ViewBag.PurchaseReturnCount</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Total Supplier</h4>
+                            <h4 class="card-text">@ViewBag.supplierCount</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-12 mt-4 mb-4">
+                    <div class="card">
+                        <h4 style="text-align:center; margin-top:10px;">Purchases Chart</h4>
+                        <div class="p-3 d-flex align-items-center">
+                            <label for="monthSelectorPurchase" class="mr-2">Select Month</label>
+                            <select id="monthSelectorPurchase" class="form-control col-md-6" onchange="updateChartPurchases()">
+                                <option value="all">All</option>
+                                <option value="0">January</option>
+                                <option value="1">February</option>
+                                <option value="2">March</option>
+                                <option value="3">April</option>
+                                <option value="4">May</option>
+                                <option value="5">June</option>
+                                <option value="6">July</option>
+                                <option value="7">August</option>
+                                <option value="8">September</option>
+                                <option value="9">October</option>
+                                <option value="10">November</option>
+                                <option value="11">December</option>
+                            </select>
+                        </div>
+                        <canvas id="lineChartPurchases" style="width:100%;width:800px"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6 col-12 mt-4 mb-4">
+                    <div class="card">
+                        <h4 style="text-align:center; margin-top:10px;">Receiving Chart</h4>
+                        <div class="p-3 d-flex align-items-center">
+                            <label for="monthSelectorReceive" class="mr-2">Select Month</label>
+                            <select id="monthSelectorReceive" class="form-control col-md-6" onchange="updateChartReceivings()">
+                                <option value="all">All</option>
+                                <option value="0">January</option>
+                                <option value="1">February</option>
+                                <option value="2">March</option>
+                                <option value="3">April</option>
+                                <option value="4">May</option>
+                                <option value="5">June</option>
+                                <option value="6">July</option>
+                                <option value="7">August</option>
+                                <option value="8">September</option>
+                                <option value="9">October</option>
+                                <option value="10">November</option>
+                                <option value="11">December</option>
+                            </select>
+                        </div>
+                        <canvas id="lineChartReceivings" style="width:100%;width:800px"></canvas>
+                    </div>
+                </div>
+            }
+            @if (User.IsInRole("admin"))
+            {
+                <div class="col-md-6 col-12 mt-4 mb-4">
+                    <div class="card">
+                        <h4 style="text-align:center; margin-top:10px;">Purchases Chart</h4>
+                        <div class="p-3 d-flex align-items-center">
+                            <label for="monthSelectorPurchase" class="mr-2">Select Month</label>
+                            <select id="monthSelectorPurchase" class="form-control col-md-6" onchange="updateChartPurchases()">
+                                <option value="all">All</option>
+                                <option value="0">January</option>
+                                <option value="1">February</option>
+                                <option value="2">March</option>
+                                <option value="3">April</option>
+                                <option value="4">May</option>
+                                <option value="5">June</option>
+                                <option value="6">July</option>
+                                <option value="7">August</option>
+                                <option value="8">September</option>
+                                <option value="9">October</option>
+                                <option value="10">November</option>
+                                <option value="11">December</option>
+                            </select>
+                        </div>
+                        <canvas id="lineChartPurchases" style="width:100%;width:800px"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6 col-12 mt-4 mb-4">
+                    <div class="card">
+                        <h4 style="text-align:center; margin-top:10px;">Receiving Chart</h4>
+                        <div class="p-3 d-flex align-items-center">
+                            <label for="monthSelectorReceive" class="mr-2">Select Month</label>
+                            <select id="monthSelectorReceive" class="form-control col-md-6" onchange="updateChartReceivings()">
+                                <option value="all">All</option>
+                                <option value="0">January</option>
+                                <option value="1">February</option>
+                                <option value="2">March</option>
+                                <option value="3">April</option>
+                                <option value="4">May</option>
+                                <option value="5">June</option>
+                                <option value="6">July</option>
+                                <option value="7">August</option>
+                                <option value="8">September</option>
+                                <option value="9">October</option>
+                                <option value="10">November</option>
+                                <option value="11">December</option>
+                            </select>
+                        </div>
+                        <canvas id="lineChartReceivings" style="width:100%;width:800px"></canvas>
+                    </div>
+                </div>
+            }
+            @if (User.IsInRole("salesmgr"))
+            {
+                <div class="col-12 col-sm-6 col-md-3 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col">
+                                    <h4 class="card-title">Total Product</h4>
+                                </div>
+                                <div class="col-auto">
+                                    <!-- Notification Icon with Badge -->
+                                    <a class="nav-link dropdown-toggle p-0" href="#" id="alertsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="material-icons icon" style="margin:0%; color: black;">
+                                            notifications
+                                        </i>
+                                        @if (ViewBag.ProductLookup != null || (ViewBag.title == ""))
+                                        {
+                                            int overallAlertCount = 0;
+
+                                            foreach (var product in ViewBag.ProductLookup ?? Model)
+                                            {
+                                                if (product.StockOnHand <= product.MinQty && product.StockOnHand > 1)
+                                                {
+                                                    overallAlertCount++;
+                                                }
+                                                else if (product.StockOnHand == 0)
+                                                {
+                                                    overallAlertCount++;
+                                                }
+                                            }
+                                            ViewBag.OverallAlertCount = overallAlertCount;
+
+                                            <span class="badge badge-danger badge-counter" style="margin-left:-14px; border-radius:60px;">
+                                                @ViewBag.OverallAlertCount
+                                            </span>
+                                        }
+                                    </a>
+
+                                    <!-- Dropdown - Alerts -->
+                                    <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                         aria-labelledby="alertsDropdown" style="overflow-y: scroll; height:30rem; width:20rem; font-size:15px; color:aqua;">
+                                        <h6 class="dropdown-header">
+                                            Notification
+                                        </h6>
+                                        @if (ViewBag.ProductLookup != null || (ViewBag.title == ""))
+                                        {
+                                            int overallAlertCount = 0;
+
+                                            foreach (var product in ViewBag.ProductLookup ?? Model)
+                                            {
+                                                if (product.StockOnHand <= product.MinQty && product.StockOnHand > 1)
+                                                {
+                                                    overallAlertCount++;
+                                                    <a class="dropdown-item d-flex align-items-center" href="">
+                                                        <div class="mr-3">
+                                                            <i class="material-icons icon" style="color:orange;">
+                                                                warning
+                                                            </i>
+                                                        </div>
+                                                        <div style="display:flex; flex-direction:row;">
+                                                            <p style="white-space: nowrap; text-overflow: ellipsis;">Low Stock for @product.Name</p>
+                                                        </div>
+                                                    </a>
+                                                }
+                                                else if (product.StockOnHand == 0)
+                                                {
+                                                    overallAlertCount++;
+                                                    <a class="dropdown-item d-flex align-items-center" href="">
+                                                        <div class="mr-3">
+                                                            <i class="material-icons icon" style="color:red;">
+                                                                error
+                                                            </i>
+                                                        </div>
+                                                        <div style="display:flex; flex-direction:row;">
+                                                            <p style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">Out of Stock for @product.Name</p>
+                                                        </div>
+                                                    </a>
+                                                }
+                                            }
+                                            ViewBag.OverallAlertCount = overallAlertCount;
+
+                                            if (overallAlertCount == 0)
+                                            {
+                                                <p style="margin-left:10px;" class="text-center">No products found.</p>
+                                            }
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <h4 class="card-text">@ViewBag.ProductCount</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Total Release</h4>
+                            <h4 class="card-text">@ViewBag.ReleaseCount</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Total Return</h4>
+                            <h4 class="card-text">@ViewBag.ReleaseReturnCount</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Total Pending Transfer</h4>
+                            <h4 class="card-text">@ViewBag.TransferCount</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-12 mt-4 mb-4">
+                    <div class="card">
+                        <h4 style="text-align:center; margin-top:10px;">Order Chart</h4>
+                        <div class="p-3 d-flex align-items-center">
+                            <label for="monthSelectorOrder" class="mr-2">Select Month</label>
+                            <select id="monthSelectorOrder" class="form-control col-md-6" onchange="updateChartOrder()">
+                                <option value="all">All</option>
+                                <option value="0">January</option>
+                                <option value="1">February</option>
+                                <option value="2">March</option>
+                                <option value="3">April</option>
+                                <option value="4">May</option>
+                                <option value="5">June</option>
+                                <option value="6">July</option>
+                                <option value="7">August</option>
+                                <option value="8">September</option>
+                                <option value="9">October</option>
+                                <option value="10">November</option>
+                                <option value="11">December</option>
+                            </select>
+                        </div>
+                        <canvas id="lineChartOrder" style="width:100%;width:800px"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6 col-12 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title text-center p-2">Latest Transfer</h5>
+                            <table class="table table-sm">
+                                @*<thead>
+                                    <tr>
+                                        <th class="text-center"></th>
+                                        <th class="text-center">Category</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var product in Model.Products)
+                                    {
+                                        <tr>
+                                            <td class="text-center">@product.Name</td>
+                                            <td class="text-center">@product.Category.Name</td>
+                                        </tr>
+                                    }
+                                </tbody>*@
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+            @if (User.IsInRole("wrhmgr"))
+            {
+                <div class="col-12 col-sm-6 col-md-3 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Total Pending Transfer</h4>
+                            <h4 class="card-text">@ViewBag.TransferCount</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h4 class="card-title">Total Receive Approval</h4>
+                            <h4 class="card-text">@ViewBag.ReceiveApproveCount</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-md-3 mt-4"></div>
+                <div class="col-md-6 col-12 mt-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title text-center p-2">Latest Transfer</h5>
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Product Name</th>
+                                        <th class="text-center">Category</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var product in Model.Products)
+                                    {
+                                        <tr>
+                                            <td class="text-center">@product.Name</td>
+                                            <td class="text-center">@product.Category.Name</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>            
+            }
+        </div>
+    }
+</div>
+
+<link href="~/Content/Util/slimselect.min.css" rel="stylesheet" />
+<script type="module">
+    import SlimSelect from '/Scripts/Util/slimselect.es.min.js'
+    new SlimSelect({
+        select: '#monthSelectorOrder'
+    })
+    new SlimSelect({
+        select: '#monthSelectorPurchase'
+    })
+    new SlimSelect({
+        select: '#monthSelectorReceive'
+    })
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+<script>
+// Get data from Model
+    var orders = @Html.Raw(JsonConvert.SerializeObject(Model.Releasings, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
+    var purchases = @Html.Raw(JsonConvert.SerializeObject(Model.Purchases, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
+    var receivings = @Html.Raw(JsonConvert.SerializeObject(Model.Receivings, new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore }));
+
+    function countOrdersByMonth(month) {
+        return orders.filter(function (order) {
+            if (order.OrderDate) {
+                var orderDate = new Date(order.OrderDate);
+                var orderMonth = orderDate.getMonth();
+                return orderMonth === month;
+            } else {
+                return false;
+            }
+        }).length;
+    }
+    function countPurchasesByMonth(month) {
+        return purchases.filter(function (purchase) {
+            if (purchase.OrderDate) {
+                var purchaseDate = new Date(purchase.OrderDate);
+                var purchaseMonth = purchaseDate.getMonth();
+                return purchaseMonth === month;
+            } else {
+                return false;
+            }
+        }).length;
+    }
+    function countReceivingsByMonth(month) {
+        return receivings.filter(function (receiving) {
+
+            if (receiving.ReceiveDate) {
+                var receivingDate = new Date(receiving.ReceiveDate);
+                var receivingMonth = receivingDate.getMonth();
+                return receivingMonth === month;
+            } else {
+                return false;
+            }
+        }).length;
+    }
+    function countOrdersByDay(day) {
+        var selectedMonth = document.getElementById('monthSelectorOrder').value;
+        var ordersInMonth = orders.filter(function (order) {
+            if (order.OrderDate) {
+                var orderDate = new Date(order.OrderDate);
+                var orderMonth = orderDate.getMonth();
+                var orderDay = orderDate.getDate();
+                return orderMonth === parseInt(selectedMonth) && orderDay === day;
+            } else {
+                return false;
+            }
+        });
+        return ordersInMonth.length;
+    }
+    function countPurchasesByDay(day) {
+        var selectedMonth = document.getElementById('monthSelectorPurchase').value;
+        var purchasesInMonth = purchases.filter(function (purchase) {
+            if (purchase.OrderDate) {
+                var purchaseDate = new Date(purchase.OrderDate);
+                var purchaseMonth = purchaseDate.getMonth();
+                var purchaseDay = purchaseDate.getDate();
+                return purchaseMonth === parseInt(selectedMonth) && purchaseDay === day;
+            } else {
+                return false;
+            }
+        });
+        return purchasesInMonth.length;
+    }
+    function countReceivingsByDay(day) {
+        var selectedMonth = document.getElementById('monthSelectorReceive').value;
+        var receivingsInMonth = receivings.filter(function (receive) {
+            if (receive.ReceiveDate) {
+                var receiveDate = new Date(receive.ReceiveDate);
+                var receiveMonth = receiveDate.getMonth();
+                var receiveDay = receiveDate.getDate();
+                return receiveMonth === parseInt(selectedMonth) && receiveDay === day;
+            } else {
+                return false;
+            }
+        });
+        return receivingsInMonth.length;
+    }
+    var labels = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var dataOrder = [];
+    var dataPurchases = [];
+    var dataReceivings = [];
+
+
+    for (var i = 0; i < labels.length; i++) {
+        dataOrder.push(countOrdersByMonth(i));
+    }
+    for (var i = 0; i < labels.length; i++) {
+        dataPurchases.push(countPurchasesByMonth(i));
+    }
+    for (var i = 0; i < labels.length; i++) {
+        dataReceivings.push(countReceivingsByMonth(i));
+    }
+    var maxCount = Math.max.apply(null, dataOrder);
+
+    var yAxisStart = orders.length + 1;
+
+    var ctx = document.getElementById('lineChartOrder').getContext('2d');
+    var lineChartOrder = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Order Data',
+                data: dataOrder,
+                borderColor: 'blue',
+                backgroundColor: 'rgba(0, 0, 255, 0.1)',
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    suggestedMin: 0,
+                    stepSize: 1,
+                    precision: 0,
+                    suggestedMax: yAxisStart,
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            var month = context.dataset.data[context.dataIndex];
+                            return 'Orders: ' + month;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    var ctp = document.getElementById('lineChartPurchases').getContext('2d');
+    var lineChartPurchases = new Chart(ctp, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Purchases Data',
+                data: dataPurchases,
+                borderColor: 'blue',
+                backgroundColor: 'rgba(0, 0, 255, 0.1)',
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    suggestedMin: 0,
+                    stepSize: 1,
+                    precision: 0,
+                    suggestedMax: yAxisStart,
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            var month = context.dataset.data[context.dataIndex];
+                            return 'Orders: ' + month;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    var ctr = document.getElementById('lineChartReceivings').getContext('2d');
+    var lineChartReceivings = new Chart(ctr, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Receivings Data',
+                data: dataReceivings,
+                borderColor: 'blue',
+                backgroundColor: 'rgba(0, 0, 255, 0.1)',
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    suggestedMin: 0,
+                    stepSize: 1,
+                    precision: 0,
+                    suggestedMax: yAxisStart,
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            var month = context.dataset.data[context.dataIndex];
+                            return 'Orders: ' + month;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    var originalLabels = [...labels];
+
+    function updateChartOrder() {
+        var selectedMonth = document.getElementById('monthSelectorOrder').value;
+        if (selectedMonth === 'all') {
+            lineChartOrder.data.labels = originalLabels;
+            lineChartOrder.data.datasets[0].data = dataOrder;
+            lineChartOrder.data.datasets[0].pointRadius = 3;
+            lineChartOrder.update();
+        } else {
+            var daysInSelectedMonth = new Date(new Date().getFullYear(), parseInt(selectedMonth) + 1, 0).getDate();
+            var labels = [];
+            for (var i = 1; i <= daysInSelectedMonth; i++) {
+                labels.push(i);
+            }
+            lineChartOrder.data.labels = labels;
+            lineChartOrder.data.datasets[0].data = labels.map(countOrdersByDay);
+            lineChartOrder.update();
+        }
+    }
+    function updateChartPurchases() {
+        var selectedMonth = document.getElementById('monthSelectorPurchase').value;
+        if (selectedMonth === 'all') {
+            lineChartPurchases.data.labels = originalLabels;
+            lineChartPurchases.data.datasets[0].data = dataReceivings;
+            lineChartPurchases.data.datasets[0].pointRadius = 3;
+            lineChartPurchases.update();
+        } else {
+            var daysInSelectedMonth = new Date(new Date().getFullYear(), parseInt(selectedMonth) + 1, 0).getDate();
+            var labels = [];
+            for (var i = 1; i <= daysInSelectedMonth; i++) {
+                labels.push(i);
+            }
+            lineChartPurchases.data.labels = labels;
+            lineChartPurchases.data.datasets[0].data = labels.map(countPurchasesByDay);
+            lineChartPurchases.update();
+        }
+    }
+    function updateChartReceivings() {
+        var selectedMonth = document.getElementById('monthSelectorReceive').value;
+        if (selectedMonth === 'all') {
+            lineChartReceivings.data.labels = originalLabels;
+            lineChartReceivings.data.datasets[0].data = dataReceivings;
+            lineChartReceivings.data.datasets[0].pointRadius = 3;
+            lineChartReceivings.update();
+        } else {
+            var daysInSelectedMonth = new Date(new Date().getFullYear(), parseInt(selectedMonth) + 1, 0).getDate();
+            var labels = [];
+            for (var i = 1; i <= daysInSelectedMonth; i++) {
+                labels.push(i);
+            }
+            lineChartReceivings.data.labels = labels;
+            lineChartReceivings.data.datasets[0].data = labels.map(countReceivingsByDay);
+            lineChartReceivings.update();
+        }
+    }
+</script>

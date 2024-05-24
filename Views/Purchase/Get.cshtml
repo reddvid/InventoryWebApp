@@ -1,0 +1,147 @@
+﻿@model ASPNETWebApp48.Models.Purchase
+@using System.Globalization
+@{
+    var modelDictionary = ViewBag.ForAddPurchaseItemPartial as Dictionary<string, object>;
+    if (modelDictionary == null)
+    {
+        modelDictionary = new Dictionary<string, object>();
+    }
+
+    // Add SupplierId to the model dictionary
+    modelDictionary["SupplierId"] = Model.Supplier.Id;
+}
+
+
+@if (User.IsInRole("wrhmgr") || User.IsInRole("salesmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+
+@if (User.IsInRole("purchmgr") || User.IsInRole("admin"))
+{
+    ViewBag.Title = "Edit Purchase - " + @Model.Supplier.Name;
+
+    <div class="container-fluid">
+        <div class="card" style="margin-bottom: 20px">
+            <div class="card-body">
+                <h2 class="text-center">@ViewBag.Title</h2><hr />
+                <form method="POST" action="/Purchase/Edit">
+                    @Html.AntiForgeryToken()
+                    <div class="row">
+                        @*<div class="col-md-2">
+                            <div class="mb-2">
+                                <label for="PurchaseNo">Purchase No</label>
+                                <input type="text" id="PurchaseNo" name="PurchaseNo" class="form-control" value="@Model.PurchaseNo" readonly>
+                            </div>
+                        </div>*@
+                        <div class="col-md-2">
+                            <div class="mb-2">
+                                <label for="OrderDate">Order Date</label>
+                                <input type="text" name="OrderDate" class="form-control" value="@Model.OrderDate.ToString("yyyy-MM-dd")" id="OrderDate" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <input type="hidden" name="Id" value="@Model.Id" id="Id">
+                            <label for="SupplierId">Supplier</label>
+                            <select id="SupplierId" name="SupplierId" class="form-control text-center" required>
+                                <option value="@Model.Supplier.Id" selected>Selected Supplier - @Model.Supplier.Name</option>
+                                @*@foreach (var supplier in ViewBag.Supplier)
+                                {
+                                    <option value="@supplier.Id">@supplier.Name</option>
+                                }*@
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="mb-2">
+                                <center>
+                                    <br />
+                                    @*<button name="submit" type="submit" class="btn btn-primary btn-md">Save</button>*@
+                                    <a href="/Purchase/Detail/@Model.Id" class="btn btn-primary btn-md">Submit</a>
+                                    <a href="/Purchase/Manage" class="btn btn-secondary btn-md">Cancel</a>
+                                </center>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <br /><h3 class="text-center">Purchased Items</h3>
+                <div class="table-responsive">
+                    <table class="table table-hover text-nowrap table-bordered table-sm">
+                        <thead class="thead-light">
+                            <tr>
+                                <th class="text-center">Action</th>
+                                <th class="text-center">Product</th>
+                                <th class="text-center">Brand</th>
+                                <th class="text-center">Quantity</th>
+                                <th class="text-center">Unit</th>
+                                <th class="text-center">Purchase Price</th>
+                                <th class="text-center">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var groupedItems = Model.PurchaseItems.GroupBy(pi => pi.ProductId);
+                            }
+
+                            @foreach (var group in groupedItems)
+                            {
+                                var firstItem = group.First();
+                                CultureInfo culture = new CultureInfo("en-PH");
+                                <tr>
+                                    <td class="text-center">
+                                        <a href="/Purchase/DelItem/@firstItem.Id" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')" title="Delete" style="height: 25px;line-height: 1.0;">&times;</a>
+                                    </td>
+                                    <td class="text-center">@firstItem.ProductSupplier.Product.Name</td>
+                                    <td class="text-center">@firstItem.ProductSupplier.Product.Brand.Name</td>
+                                    <td class="text-center">@group.Sum(pi => pi.Quantity)</td>
+                                    <td class="text-center">@firstItem.ProductSupplier.Product.Unit</td>
+                                    <td class="text-center">@firstItem.PurchasePrice.ToString("C", culture)</td>
+                                    <td class="text-center">@group.Sum(pi => pi.Amount).ToString("C", culture)</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="1" class="text-center">
+                                    @*@Html.Partial("_AddPurchaseItem", ViewBag.ForAddPurchaseItemPartial as Dictionary<string, object>)*@
+                                    @Html.Partial("_AddPurchaseItem", modelDictionary)
+                                </td>
+                                <td colspan="5" class="text-right">
+                                    <strong>Total:</strong>
+                                </td>
+                                <td class="text-center">
+                                    <strong>₱@Model.OrderTotal.ToString("N2")</strong>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <link rel="stylesheet" href="/Content/Util/slimselect.min.css" />
+    <script src="https://unpkg.com/slim-select@latest/dist/slimselect.min.js"></script>
+    <script>
+        new SlimSelect({
+            select: '#SupplierId',
+            settings: { searchPlaceholder: 'Search for the Supplier!' }
+        });
+    </script>
+
+    @*@section scripts {
+        <script>
+            $(document).ready(function () {
+                $('#SupplierId').change(function () {
+                    var supplierId = $(this).val();
+                    $.get("/Purchase/GetProductsBySupplier", { supplierId: supplierId }, function (data) {
+                        $("#ProductId").empty(); // Clear existing options
+                        $("#ProductId").append('<option value="">Please select a Product</option>'); // Add default option
+                        $.each(data, function (index, product) {
+                            $("#ProductId").append('<option value="' + product.Value + '">' + product.Text + '</option>'); // Add product options
+                        });
+                    });
+                });
+            })
+        </script>
+    }*@
+}

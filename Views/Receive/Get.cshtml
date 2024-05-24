@@ -1,0 +1,133 @@
+﻿@model ASPNETWebApp48.Models.Receiving
+@using System.Globalization
+@if (User.IsInRole("purchmgr") || User.IsInRole("salesmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+
+@if (User.IsInRole("wrhmgr") || User.IsInRole("admin"))
+{
+    ViewBag.Title = "Edit Receiving - "+Model.Supplier.Name;
+
+    <div class="container-fluid">
+        <div class="card" style="margin-bottom: 20px">
+            <div class="card-body">
+                <h2 class="text-center">@ViewBag.Title</h2><hr />
+                <form method="POST" action="/Receive/Get">
+                    @Html.AntiForgeryToken()
+                    <div class="row">
+                        @*<div class="col-md-2">
+                            <div class="mb-2">
+                                <label for="PurchaseNo">Purchase No</label>
+                                <input type="text" id="PurchaseNo" name="PurchaseNo" class="form-control" value="@Model.PurchaseNo" readonly>
+                            </div>
+                        </div>*@
+                        <div class="col-md-2">
+                            <div class="mb-2">
+                                <label for="OrderDate">Order Date</label>
+                                <input type="date" name="ReceiveDate" class="form-control" value="@Model.ReceiveDate.ToString("yyyy-MM-dd")" id="ReceiveDate" readonly>
+                                <input type="hidden" name="Id" value="@Model.Id" id="Id">
+                                <input type="hidden" name="PurchaseId" value="@Model.PurchaseId" id="PurchaseId">
+                                <input type="hidden" name="SupplierId" value="@Model.SupplierId" id="SupplierId">
+                                <input type="hidden" name="Status" value="@Model.Status" id="Status">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="mb-2">
+                                <label for="">Location</label>
+                                <select id="LocationId" name="LocationId" class="form-control" required="required">
+                                    <option value="@Model.LocationId" selected>Selected - @Model.Locations.Name</option>
+                                    @*@if (Model.LocationId == 1)
+                                    {
+                                        <option value="2">Selected - Warehouse</option>
+                                    }
+                                    @if (Model.LocationId == 2)
+                                    {
+                                        <option value="1">Selected - Main Store</option>
+                                    }*@
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="Notes">Notes</label>
+                            <textarea id="Notes" name="Notes" class="form-control zoom-3" rows="2" title="Only letters allowed" placeholder="Optional">@Model.Notes</textarea>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="mb-2">
+                                <center>
+                                    <br /><br />
+                                    <button name="submit" type="submit" class="btn btn-primary btn-md">Submit</button>
+                                    <a href="/Receive/Manage" class="btn btn-secondary btn-md">Go back</a>
+                                </center>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <br /><h3 class="text-center">Received Items</h3>
+                <div class="table-responsive">
+                    <table class="table table-hover text-nowrap table-bordered table-sm">
+                        <thead class="thead-light">
+                            <tr>
+                                <th class="text-center">Product</th>
+                                <th class="text-center">Brand</th>
+                                <th class="text-center">Quantity</th>
+                                <th class="text-center">Unit</th>
+                                <th class="text-center">Purchase Price</th>
+                                <th class="text-center">Amount</th>
+                                <th class="text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                // Group PurchaseItems by ProductId
+                                var groupedItems = Model.ReceivingItems.GroupBy(pi => pi.ProductId);
+                            }
+
+                            @foreach (var group in groupedItems)
+                            {
+                                // Take the first item in the group to access product information
+                                var firstItem = group.First();
+                                CultureInfo culture = new CultureInfo("en-PH");
+                                <tr>
+                                    <td class="text-center">@firstItem.ProductSupplier.Product.Name</td>
+                                    <td class="text-center">@firstItem.ProductSupplier.Product.Brand.Name</td>
+                                    <td class="text-center">@group.Sum(pi => pi.Quantity)</td>
+                                    <td class="text-center">@firstItem.ProductSupplier.Product.Unit</td>
+                                    <td class="text-center">@firstItem.PurchasePrice.ToString("C", culture)</td>
+                                    <td class="text-center">@group.Sum(pi => pi.Amount).ToString("C", culture)</td>
+                                    <td class="text-center">
+                                        <a href="/Receive/Edit/@firstItem.Id" class="btn btn-warning btn-sm" title="Edit" style="height: 25px;line-height: 1.0;">Edit</a>
+                                        <a href="/Receive/DelItem/@firstItem.Id" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure?')" title="Delete" style="height: 25px;line-height: 1.0;">&times;</a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="5" class="text-right">
+                                    <strong>Total:</strong>
+                                </td>
+                                <td class="text-center">
+                                    <strong>₱@Model.OrderTotal.ToString("N2")</strong>
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('Notes').addEventListener('input', function () {
+            var regex = /^[A-Za-z ]*$/;
+            var textareaValue = this.value;
+            if (!regex.test(textareaValue)) {
+                this.setCustomValidity('Only letters and spaces are allowed.');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    </script>
+}

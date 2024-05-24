@@ -1,0 +1,34 @@
+﻿@using System.Globalization
+@model ASPNETWebApp48.ViewModels.QtyOnHandViewModel
+
+@{
+    ViewBag.Title = "All Location Inventory Report";
+    Layout = "~/Views/Shared/_PdfLayout.cshtml";
+}
+
+<p class="text-right"><strong>@DateTime.Today.ToString("MMMM-dd-yyyy")</strong></p>
+<center>
+    <h3>JIMAR CONSTRUCTION SUPPLY CO., LTD.</h3>
+    111-113 Gomez St. Cagayan De Oro City<br />
+    Tel. Nos. (08822) 72-60-25, 72-31-44, 72-32-96 Fax 72-38-84
+    <br /><br /><h3>@ViewBag.Title</h3><br />
+</center>
+<table class="table table-sm table-bordered table-nowrap">
+    <tr class="thead-light">
+        <th class="text-center">Product</th>
+        <th class="text-center">Main Store</th>
+        <th class="text-center">Warehouse</th>
+        <th class="text-center">Total</th>
+    </tr>
+    <tbody>
+        @foreach (var item in Model.MergedProducts)
+        {
+            <tr>
+                <td scope="row" class="text-center">@item.Name</td>
+                <td scope="row" class="text-center">@item.StockOnHandMain</td>
+                <td scope="row" class="text-center">@item.StockOnHandWarehouse</td>
+                <td scope="row" class="text-center">@item.TotalStockOnHand</td>
+            </tr>
+        }
+    </tbody>
+</table>

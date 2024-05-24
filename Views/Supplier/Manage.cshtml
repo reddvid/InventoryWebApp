@@ -1,0 +1,58 @@
+﻿@model List<ASPNETWebApp48.Models.Supplier>
+
+@if (User.IsInRole("wrhmgr") || User.IsInRole("salesmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+
+@if (User.IsInRole("purchmgr") || User.IsInRole("admin"))
+{
+    ViewBag.Title = "Manage Supplier";
+
+    <div class="container-fluid">
+        <p class="float-right">
+            @Html.Partial("_Create")
+        </p>
+        <h2 class="text-center">@ViewBag.Title</h2>
+        <div class="table-responsive">
+            <table class="table-sm table-hover text-nowrap table-bordered" id="myTable">
+                <thead>
+                    <tr>
+                        <th class="text-center">Name</th>
+                        @*<th class="text-center">Address</th>*@
+                        <th class="text-center">Phone Number</th>
+                        <th class="text-center">Email</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var supplier in Model)
+                    {
+                        <tr>
+                            <td class="text-center">@supplier.Name</td>
+                            @*<td class="text-center">@supplier.Address</td>*@
+                            <td class="text-center">@supplier.PhoneNo</td>
+                            <td class="text-center">@supplier.Email</td>
+                            <td class="text-center">@supplier.Status</td>
+                            <td class="text-center">
+                                <a href="/Supplier/Edit/@supplier.Id" class="btn btn-warning btn-sm">Edit</a>
+                                @if(User.IsInRole("admin"))
+                                {
+                                    if(supplier.Status.Contains("Active"))
+                                    {
+                                        <a href="/Supplier/Deactivate/@supplier.Id" class="btn btn-danger btn-sm">Deactivate</a>
+                                    }
+                                    if(supplier.Status.Contains("Inactive"))
+                                    {
+                                        <a href="/Supplier/Activate/@supplier.Id" class="btn btn-warning btn-sm">Activate</a>
+                                    }
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

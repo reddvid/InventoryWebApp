@@ -1,0 +1,59 @@
+﻿@model List<ASPNETWebApp48.Models.ProductWarehouse>
+@using System.Globalization
+
+@if (User.IsInRole("wrhmgr") || User.IsInRole("salesmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+
+@if (User.IsInRole("admin") || User.IsInRole("purchmgr"))
+{
+    ViewBag.Title = "Manage Product (Warehouse)";
+    <div class="container-fluid">
+        <p class="float-right">
+            @Html.Partial("_Create", ViewBag.ForCreatePartial as Dictionary<string, object>)
+        </p><br />
+        <h3 class="text-center">@ViewBag.Title</h3>
+        <div class="table-responsive">
+            <table class="table table-hover text-nowrap table-bordered table-sm" id="myTable">
+                <thead>
+                    <tr>
+                        <th class="text-center">Product Name</th>
+                        <th class="text-center">Brand</th>
+                        <th class="text-center">Category</th>
+                        <th class="text-center">Purchase Price</th>
+                        <th class="text-center">Unit</th>
+                        <th class="text-center">Min Qty</th>
+                        <th class="text-center">Ceiling Qty</th>
+                        <th class="text-center">Photo</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model)
+                    {
+                        CultureInfo culture = new CultureInfo("en-PH");
+                        <tr>
+                            <td class="text-center">@product.Name</td>
+                            <td class="text-center">@product.Brand.Name</td>
+                            <td class="text-center">@product.Category.Name</td>
+                            <td class="text-center">@product.PurchasePrice.ToString("C", culture)</td>
+                            <td class="text-center">@product.Unit</td>
+                            <td class="text-center">@product.MinQty</td>
+                            <td class="text-center">@product.CeilingQty</td>
+                            <td class="text-center">
+                                @if (!string.IsNullOrEmpty(product.PictureFilename))
+                                {
+                                    <img src="/uploadedimages/thumb/@product.PictureFilename" class="img-rounded" />
+                                }
+                            </td>
+                            <td class="text-center">
+                                <a href="/ProductWarehouse/Edit/@product.Id" class="btn btn-warning btn-sm">Edit</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

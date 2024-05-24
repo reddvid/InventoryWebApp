@@ -1,0 +1,45 @@
+﻿@model List<ASPNETWebApp48.Models.PurchasePrice>
+@using System.Globalization
+
+@if (User.IsInRole("wrhmgr") || User.IsInRole("salesmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+@if (User.IsInRole("purchmgr") || User.IsInRole("admin"))
+{
+    ViewBag.Title = "Manage Purchase Price";
+
+    <div class="container-fluid">
+        <p class="float-right">
+            @Html.Partial("_Create", ViewBag.ForCreatePartial as Dictionary<string, object>)
+        </p>
+        <br />
+        <h3 class="text-center">@ViewBag.Title</h3>
+        <div class="table-responsive">
+            <table class="table table-hover text-nowrap table-bordered table-sm" id="myTable">
+                <thead>
+                    <tr>
+                        <th class="text-center">Price Date</th>
+                        <th class="text-center">Product</th>
+                        <th class="text-center">Brand</th>
+                        @*<th class="text-center">Percent</th>*@
+                        <th class="text-center">Updated Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var product in Model)
+                    {
+                        CultureInfo culture = new CultureInfo("en-PH");
+                        <tr>
+                            <td class="text-center">@product.PriceDate.ToString("dd-MMM-yyyy")</td>
+                            <td class="text-center">@product.Product.Name</td>
+                            <td class="text-center">@product.Product.Brand.Name</td>
+                            @*<td class="text-center">@product.Percent</td>*@
+                            <td class="text-center">@product.UpdatedPrice.ToString("C", culture)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

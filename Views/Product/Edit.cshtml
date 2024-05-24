@@ -1,0 +1,166 @@
+﻿@model ASPNETWebApp48.ViewModels.ProductEditViewModel
+
+@if (User.IsInRole("wrhmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+
+@if (User.IsInRole("admin") || User.IsInRole("purchmgr") || User.IsInRole("salesmgr"))
+{
+    ViewBag.Title = "Edit Product - " + Model.Product.Name;
+
+    <div class="container-fluid">
+        <h2 class="col-12 col-md-8 text-center">@ViewBag.Title</h2>
+        <form action="/Product/Edit" method="post" enctype="multipart/form-data" class="form-horizontal mt-3">
+            @Html.AntiForgeryToken()
+            <!-- Text input-->
+            <div class="form-group row">
+                <label for="Name" class="col-sm-2 col-form-label text-center zoom-3">Name</label>
+                <div class="col-sm-10">
+                    <input type="hidden" name="Id" value="@Model.Product.Id" id="Id">
+                    <input id="Name" name="Name" type="text" value="@Model.Product.Name" class="form-control zoom-3" title="Only Name allowed" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label text-center zoom-3">Brand</label>
+                <div class="col-sm-5 col-10">
+                    <select id="BrandId" name="BrandId" required class="form-control zoom-3">
+                        <option value="@Model.Product.BrandId" selected>Current Brand - @Model.Product.Brand.Name</option>
+                        @foreach (var brand in Model.Brands)
+                        {
+                            <option value="@brand.Id">@brand.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="SKU" class="col-sm-2 col-form-label text-center zoom-3">SKU</label>
+                <div class="col-sm-10">
+                    <input type="text" id="SKU" name="SKU" value="@Model.Product.SKU" pattern="[a-zA-Z0-9]+" title="Only SKU allowed" class="form-control zoom-3">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label text-center zoom-3">Category</label>
+                <div class="col-sm-5 col-10">
+                    <select id="CategoryId" name="CategoryId" required class="form-control zoom-3">
+                        <option value="@Model.Product.Category.Id" selected>Current Category - @Model.Product.Category.Name</option>
+                        @foreach (var category in Model.Categories)
+                        {
+                            <option value="@category.Id">@category.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label text-center zoom-3">Supplier</label>
+                <div class="col-sm-5 col-10">
+                    <select multiple="multiple" name="SupplierId" id="SupplierId" class="form-control zoom-3" required>
+                        @foreach (var supplier in Model.Suppliers)
+                        {
+                            <option value="@supplier.Id" @(Model.SelectedSupplierIds.Contains(supplier.Id) ? "selected" : "")>
+                                @supplier.Name
+                            </option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="PurchasePrice" class="col-sm-2 col-form-label text-center zoom-3">Purchase Price</label>
+                <div class="col-sm-10">
+                    <input id="PurchasePrice" name="PurchasePrice" type="text" value="@Model.Product.PurchasePrice" min="5" class="form-control zoom-3" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="SellingPrice" class="col-sm-2 col-form-label text-center zoom-3">Selling Price</label>
+                <div class="col-sm-10">
+                    <input id="SellingPrice" name="SellingPrice" type="text" value="@Model.Product.SellingPrice" min="5" class="form-control zoom-3" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-2 col-form-label text-center zoom-3">Unit</label>
+                <div class="col-sm-5 col-10">
+                    <select id="Unit" name="Unit" class="form-control zoom-3" required>
+                        <option value="@Model.Product.Unit" selected>Current Unit - @Model.Product.Unit</option>
+                        <option value="Length">Length</option>
+                        <option value="Sheet">Sheet</option>
+                        <option value="Kilo">Kilo</option>
+                        <option value="Set">Set</option>
+                        <option value="Piece">Piece</option>
+                        <option value="Can">Can</option>
+                        <option value="Meter">Meter</option>
+                        <option value="Box">Box</option>
+                        <option value="Bag">Bag</option>
+                        <option value="Gallon">Gallon</option>
+                        <option value="Liter">Liter</option>
+                        <option value="Bottle">Bottle</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="MinQty" class="col-sm-2 col-form-label text-center zoom-3">Min Qty</label>
+                <div class="col-sm-10 zoom-3">
+                    <input id="MinQty" name="MinQty" type="text" class="form-control" min="5" pattern="[0-9.]+" title="Only qty allowed" value="@Model.Product.MinQty" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="CeilingQty" class="col-sm-2 col-form-label text-center zoom-3">Ceiling Qty</label>
+                <div class="col-sm-10 zoom-3">
+                    <input id="CeilingQty" name="CeilingQty" type="text" class="form-control" min="5" pattern="[0-9.]+" title="Only qty allowed" value="@Model.Product.CeilingQty" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="fileUpload" class="col-sm-2 col-form-label text-center zoom-3">Upload Photo</label>
+                <div class="col-sm-10 zoom-3">
+                    <input type="file" accept="image/*" id="fileUpload" name="fileUpload" class="form-control-file">
+                </div>
+            </div>
+            @if (!string.IsNullOrEmpty(Model.Product.PictureFilename))
+            {
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label text-center zoom-3">Photo</label>
+                    <div class="col-sm-10">
+                        <img src="/uploadedimages/@Model.Product.PictureFilename" class="img-thumbnail" alt="@Model.Product.Name Photo">
+                    </div>
+                </div>
+            }
+            <!-- Button -->
+            <div class="form-group row">
+                <label class="col-sm-2"></label>
+                <div class="col-sm-10">
+                    <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                    <a href="/Product/manage" class="btn btn-secondary btn-lg">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+}
+
+<link rel="stylesheet" href="/Content/Util/slimselect.min.css" />
+<script type="module">
+    import SlimSelect from '/Scripts/Util/slimselect.es.min.js'
+    new SlimSelect({
+        select: '#BrandId',
+        settings: { searchPlaceholder: 'Search for the Brand!' }
+    });
+    new SlimSelect({
+        select: '#CategoryId',
+        settings: { searchPlaceholder: 'Search for the Category!' }
+    });
+    new SlimSelect({
+        select: '#SupplierId',
+        settings: { searchPlaceholder: 'Search for the Supplier!' }
+    });
+    new SlimSelect({
+        select: '#Unit',
+        settings: { searchPlaceholder: 'Search for the Unit!' }
+    });
+</script>
+
+<style>
+    select[required] {
+        display: block !important;
+        position: absolute;
+        clip: rect(0, 0, 0, 0);
+        pointer-events: none;
+    }
+</style>

@@ -1,0 +1,67 @@
+﻿@model Dictionary<string, object>
+
+<button type="button" id="btnAddModal1" class="btn btn-primary btn-circle btn-lg" data-toggle="modal" data-target="#addModal">+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="addModal" data-backdrop="static" data-keyboard="false" aria-labelledby="addModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <form action="/PurchaseReturn/Create" method="post" enctype="multipart/form-data" class="form-horizontal">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create New Purchase</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    <!-- Text input-->
+                    <div class="form-group">
+                        <select id="PurchaseId" name="PurchaseId" class="form-control text-center" autofocus required>
+                            <option value="" selected disabled>Select Supplier from Purchase</option>
+                            @foreach (var suplier in Model["PurchaseLookup"] as List<Purchase>)
+                            {
+                                <option value="@suplier.Id">@suplier.Supplier.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group row">
+                        <label for="ReturnDate" class="col-md-4 col-form-label">Return Date</label>
+                        <div class="col-md-8">
+                            <input type="text" id="ReturnDate" name="ReturnDate" value="@ViewBag.ReturnDate.ToString("yyyy-MM-dd")" class="form-control" readonly>
+                            <input type="hidden" id="Status" name="Status" value="Pending" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="Reason" class="col-md-4 col-form-label">Reason</label>
+                        <div class="col-md-8">
+                            <textarea id="Reason" name="Reason" cols="40" rows="4" placeholder="Your Reason" class="form-control" required></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="/Content/Util/slimselect.min.css" />
+<script type="module">
+    import SlimSelect from '/Scripts/Util/slimselect.es.min.js'
+    new SlimSelect({
+        select: '#PurchaseId',
+        settings: { searchPlaceholder: 'Search for the Supplier!' }
+    });
+</script>
+
+<style>
+    select[required] {
+        display: block !important;
+        position: absolute;
+        clip: rect(0, 0, 0, 0);
+        pointer-events: none;
+    }
+</style>

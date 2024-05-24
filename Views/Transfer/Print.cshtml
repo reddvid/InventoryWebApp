@@ -1,0 +1,67 @@
+﻿@model ASPNETWebApp48.Models.TransferDetail
+@using System.Globalization
+@{
+    ViewBag.Title = "Transfer Detail";
+    Layout = "~/Views/Shared/_PdfLayout.cshtml";
+}
+
+<h3>JIMAR CONSTRUCTION SUPPLY CO., LTD. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<strong>@ViewBag.Title</strong></h3>
+111-113 Gomez St. Cagayan De Oro City
+<br />
+Tel. Nos. (08822) 72-60-25, 72-31-44, 72-32-96 Fax 72-38-84
+<br />
+<br />
+<h5>
+    Id : @Model.Id<br />
+    Location : @Model.Locations.Name<br />
+    Date : @Model.TransferDate.ToString("yyyy-MM-dd")<br />
+    Status : @Model.Status<br />
+</h5>
+
+<h3 class="text-center">Transfered Items</h3>
+<div class="table-responsive">
+    <table class="table table-hover text-nowrap table-bordered table-sm">
+        <thead class="thead-light">
+            <tr>
+                <th class="text-center">Product</th>
+                <th class="text-center">Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.LocationId == 1)
+            {
+                // Group PurchaseItems by ProductId
+                var groupedItems = Model.TransferItemStores.GroupBy(pi => pi.ProductId);
+
+                foreach (var group in groupedItems)
+                {
+                    // Take the first item in the group to access product information
+                    var firstItem = group.First();
+                    <tr>
+                        <td class="text-center">@firstItem.Product.Name</td>
+                        <td class="text-center">@group.Sum(pi => pi.Quantity)</td>
+                    </tr>
+                }
+            }
+            @if (Model.LocationId == 2)
+            {
+                // Group PurchaseItems by ProductId
+                var groupedItems = Model.TransferItemWarehouses.GroupBy(pi => pi.WarehouseId);
+
+                foreach (var group in groupedItems)
+                {
+                    // Take the first item in the group to access product information
+                    var firstItem = group.First();
+                    <tr>
+                        <td class="text-center">@firstItem.ProductWarehouse.Name</td>
+                        <td class="text-center">@group.Sum(pi => pi.Quantity)</td>
+                    </tr>
+                }
+            }
+        </tbody>
+
+    </table>
+</div>
+<h5>
+    Notes : @Model.Notes
+</h5>

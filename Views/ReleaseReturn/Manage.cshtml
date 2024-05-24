@@ -1,0 +1,53 @@
+﻿@model List<ASPNETWebApp48.Models.ReleaseReturn>
+
+@if (User.IsInRole("wrhmgr") || User.IsInRole("purchmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+
+@if (User.IsInRole("admin") || User.IsInRole("salesmgr"))
+{
+    ViewBag.Title = "Manage Releasing Return";
+
+    <div class="container-fluid">
+        <p class="float-right">
+            <a class="btn btn-warning" href="/ReleaseReturn/ManageApproval">Approval</a>
+            @Html.Partial("_Create", ViewBag.ForCreatePartial as Dictionary<string, object>)
+        </p>
+        <h2 class="text-center">@ViewBag.Title</h2>
+        <div class="table-responsive">
+            <table class="table table-hover text-nowrap table-bordered" id="myTable">
+                <thead>
+                    <tr>
+                        <th class="text-center">Client Name</th>
+                        <th class="text-center">Return Date</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Reason</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var returns in Model)
+                    {
+                        <tr>
+                            <td class="text-center">@returns.Releasing.ClientName</td>
+                            <td class="text-center">@returns.ReturnDate.ToString("dd-MMM-yyyy")</td>
+                            <td class="text-center">@returns.Status</td>
+                            <td class="text-center">@returns.Reason</td>
+                            <td class="text-center">
+                                @if (returns.Status.Contains("Pending"))
+                                {
+                                    <a class="btn btn-warning btn-sm" href="/ReleaseReturn/Get/@returns.Id">Edit</a>
+                                }
+                                @if (returns.Status.Contains("Approve") || returns.Status.Contains("Reject"))
+                                {
+                                    <a href="/ReleaseReturn/Print/@returns.Id"><input type="button" class="btn btn-info btn-sm" value="Print"></a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

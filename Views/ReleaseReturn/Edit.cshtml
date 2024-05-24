@@ -1,0 +1,74 @@
+﻿@model ASPNETWebApp48.Models.Return
+
+@if (User.IsInRole("invmgr") || User.IsInRole("purchmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+
+@if (User.IsInRole("admin") || User.IsInRole("salesmgr"))
+{
+    ViewBag.Title = "Edit Return - " + Model.Order.LastName + " " + Model.Order.FirstName;
+
+    <div class="container-fluid">
+        <div class="col-8 text-center">
+            <h2>@ViewBag.Title</h2><br />
+        </div>
+        <form action="/Return/Edit" method="post" enctype="multipart/form-data" class="form-horizontal mt-3">
+            @Html.AntiForgeryToken()
+            <!-- Text input-->
+            <div class="form-group row">
+                <label for="OrderId" class="col-sm-2 col-form-label text-center zoom-3">Customer:</label>
+                <div class="col-sm-6">
+                    <input id="Id" name="Id" type="hidden" value="@Model.Id" class="form-control">
+                    <select id="OrderId" name="OrderId" class="form-control zoom-3" required>
+                        <option value="@Model.OrderId" selected>Selected Order: @Model.Order.LastName,@Model.Order.FirstName</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="ReturnDate" class="col-sm-2 col-form-label text-center zoom-3">Return Date:</label>
+                <div class="col-sm-10">
+                    <input id="ReturnDate" name="ReturnDate" type="date" value="@Model.ReturnDate.ToString("yyyy-MM-dd")" readonly class="form-control zoom-3">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="ProductId" class="col-sm-2 col-form-label text-center zoom-3">Product:</label>
+                <div class="col-sm-6">
+                    <select id="ProductId" name="ProductId" class="form-control text-center zoom-3" required>
+                        <option value="@Model.ProductId" selected>@Model.Product.Name</option>
+                        @foreach (var product in ViewBag.products)
+                        {
+                            <option value="@product.Id">@product.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="Quantity" class="col-sm-2 col-form-label text-center zoom-3">Quantity:</label>
+                <div class="col-sm-10">
+                    <input id="Quantity" name="Quantity" type="number" value="@Model.Quantity" class="form-control zoom-3" min="1" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="Reason" class="col-sm-2 col-form-label text-center zoom-3">Reason:</label>
+                <div class="col-sm-10">
+                    <select id="Reason" name="Reason" class="custom-select" required="required">
+                        <option selected value="@Model.Reason">@Model.Reason</option>
+                        <option value="Add to stock">Add to stock</option>
+                        <option value="Dispose">Dispose</option>
+                        <option value="Repair">Repair</option>
+                        <option value="Damage">Damage</option>
+                    </select>
+                </div>
+            </div>
+            <!-- Button -->
+            <div class="form-group row">
+                <label class="col-sm-2"></label>
+                <div class="col-4">
+                    <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                    <a href="/Return/Manage" class="btn btn-secondary btn-lg">Cancel</a>
+                </div>
+            </div>
+        </form>
+    </div>
+}

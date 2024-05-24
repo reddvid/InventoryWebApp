@@ -1,0 +1,39 @@
+﻿@using System.Globalization
+@model List<ASPNETWebApp48.Models.ProductWarehouse>
+
+@{
+    ViewBag.Title = "Inventory Report - Warehouse";
+    Layout = "~/Views/Shared/_PdfLayout.cshtml";
+}
+
+<p class="text-right"><strong>@DateTime.Today.ToString("MMMM-dd-yyyy")</strong></p>
+<center>
+    <h3>JIMAR CONSTRUCTION SUPPLY CO., LTD.</h3>
+    111-113 Gomez St. Cagayan De Oro City<br />
+    Tel. Nos. (08822) 72-60-25, 72-31-44, 72-32-96 Fax 72-38-84
+    <br /><br /><h3>@ViewBag.Title</h3><br />
+</center>
+<table class="table table-sm table-bordered table-nowrap">
+    <tr class="thead-light">
+        <th class="text-center">Product Name</th>
+        <th class="text-center">Unit</th>
+        <th class="text-center">Purchase Price</th>
+        <th class="text-center">Stock In</th>
+        <th class="text-center">Stock Out</th>
+        <th class="text-center">Current Stock</th>
+    </tr>
+    <tbody>
+        @foreach (var product in Model)
+        {
+            CultureInfo culture = new CultureInfo("en-PH");
+            <tr>
+                <td class="text-center">@product.Name</td>
+                <td class="text-center">@product.Unit</td>
+                <td class="text-center">@product.PurchasePrice.ToString("C", culture)</td>
+                <td class="text-center">@product.Restock</td>
+                <td class="text-center">@product.Deduct</td>
+                <td class="text-center">@product.StockOnHand</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,43 @@
+﻿@model ASPNETWebApp48.Models.ReceivingItem
+
+@if (User.IsInRole("purchmgr") || User.IsInRole("salesmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+
+@if (User.IsInRole("wrhmgr") || User.IsInRole("admin"))
+{
+    ViewBag.Title = "Edit Item" + " " + Model.ProductSupplier.Product.Name;
+
+    <div class="container-fluid">
+        <h2 class="col-12 col-md-8 text-center">@ViewBag.Title</h2>
+        <form action="/Receive/Edit" method="post" enctype="multipart/form-data" class="form-horizontal mt-3">
+            @Html.AntiForgeryToken()
+            <!-- Text input-->
+            <div class="form-group row">
+                <label for="Quantity" class="col-sm-2 col-form-label text-center zoom-3">Quantity</label>
+                <div class="col-sm-10">
+                    <input type="hidden" id="Id" name="Id" value="@Model.Id">
+                    <input type="hidden" id="ReceiveId" name="ReceiveId" value="@Model.ReceiveId">
+                    <input type="hidden" id="ProductId" name="ProductId" value="@Model.ProductId">
+                    <input type="hidden" id="ProductSupId" name="ProductSupId" value="@Model.ProductSupId">
+                    <input id="Quantity" name="Quantity" type="number" value="@Model.Quantity" class="form-control zoom-3" min="1" required>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="PurchasePrice" class="col-sm-2 col-form-label text-center zoom-3">Price</label>
+                <div class="col-sm-10">
+                    <input id="PurchasePrice" name="PurchasePrice" type="number" value="@Model.PurchasePrice" class="form-control zoom-3" min="1" required>
+                </div>
+            </div>
+            <!-- Button -->
+            <div class="form-group row">
+                <label class="col-sm-2"></label>
+                <div class="col-sm-10">
+                    <a href="/Receive/Get/@Model.ReceiveId" class="btn btn-secondary btn-lg">Back</a>
+                    <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+}

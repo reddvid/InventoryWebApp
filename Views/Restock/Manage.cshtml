@@ -1,0 +1,111 @@
+﻿@model ASPNETWebApp48.ViewModels.StockViewModel
+
+@if (User.IsInRole("wrhmgr") || User.IsInRole("salesmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+
+@if (User.IsInRole("purchmgr") || User.IsInRole("admin"))
+{
+    ViewBag.Title = "Product Request Approval";
+
+<div class="container-fluid">
+    <h2 class="text-center">@ViewBag.Title</h2>
+    <div class="row">
+        &nbsp;&nbsp;&nbsp;
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Select Product Request
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <a class="dropdown-item" href="/Restock/ManageApproved">Main Store Approved</a>
+                <a class="dropdown-item" href="/Restock/ManageReject">Main Store Reject</a>
+                <a class="dropdown-item" href="/Restock/ManageWarehouseApproved">Warehouse Approved</a>
+                <a class="dropdown-item" href="/Restock/ManageWarehouseReject">Warehouse Reject</a>
+            </div>
+        </div>
+        <select class="form-control m-2 text-center col-12 col-md-3" id="selectloc">
+            <option value="" selected>Select Location</option>
+            <option value="Main Store">Main Store</option>
+            <option value="Warehouse">Pacana Warehouse</option>
+        </select>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover text-nowrap table-bordered" id="myTableapproval">
+            <thead>
+                <tr>
+                    <th class="text-center">Product</th>
+                    <th class="text-center">Quantity</th>
+                    <th class="text-center">Request Date</th>
+                    <th class="text-center">Location</th>
+                    <th class="text-center">Notes</th>
+                    <th class="text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var req in Model.WarehousePendingLookup)
+                {
+                    <tr>
+                        <td class="text-center">@req.ProductWarehouse.Name</td>
+                        <td class="text-center">@req.Quantity</td>
+                        <td class="text-center">@req.RequestDate.ToString("dd-MMM-yyyy")</td>
+                        <td class="text-center">Warehouse</td>
+                        <td class="text-center">@req.Notes</td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center">
+                                <form action="/Restock/ApproveWarehouse" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="Id" value="@req.Id" />
+                                    <input type="hidden" id="ApproveDate" name="ApproveDate" value="@ViewBag.ApproveDate.ToString("yyyy-MM-dd")">
+                                    <div class="btn-group" role="group">
+                                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                    </div>
+                                </form>&nbsp;
+                                <form action="/Restock/RejectWarehouse" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="Id" value="@req.Id" />
+                                    <input type="hidden" id="RejectDate" name="RejectDate" value="@ViewBag.RejectDate.ToString("yyyy-MM-dd")">
+                                    <div class="btn-group" role="group">
+                                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+
+                @foreach (var req in Model.PendingLookup)
+                {
+                    <tr>
+                        <td class="text-center">@req.Product.Name</td>
+                        <td class="text-center">@req.Quantity</td>
+                        <td class="text-center">@req.RequestDate.ToString("dd-MMM-yyyy")</td>
+                        <td class="text-center">Main Store</td>
+                        <td class="text-center">@req.Notes</td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center">
+                                <form action="/Restock/Approve" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="Id" value="@req.Id" />
+                                    <input type="hidden" id="ApproveDate" name="ApproveDate" value="@ViewBag.ApproveDate.ToString("yyyy-MM-dd")">
+                                    <div class="btn-group" role="group">
+                                        <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                    </div>
+                                </form>&nbsp;
+                                <form action="/Restock/Reject" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="Id" value="@req.Id" />
+                                    <input type="hidden" id="RejectDate" name="RejectDate" value="@ViewBag.RejectDate.ToString("yyyy-MM-dd")">
+                                    <div class="btn-group" role="group">
+                                        <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+}

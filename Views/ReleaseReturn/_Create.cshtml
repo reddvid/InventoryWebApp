@@ -1,0 +1,73 @@
+﻿@model Dictionary<string, object>
+
+@{
+    var orders = Model["ReleaseLookup"] as List<Releasing>;
+}
+
+<button type="button" id="btnAddModal1" class="btn btn-primary btn-circle btn-lg" data-toggle="modal" data-target="#addModal">+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="addModal" data-backdrop="static" data-keyboard="false" aria-labelledby="addModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <form action="/ReleaseReturn/Create" method="post" enctype="multipart/form-data" class="form-horizontal">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Release Return</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    <!-- Text input-->
+                    <div class="form-group">
+                        <select id="ReleaseId" name="ReleaseId" class="form-control" required="required">
+                            <option value="" selected disabled>Select Releasing</option>
+                            @foreach (var releasing in orders)
+                            {
+                                <option value="@releasing.Id">@releasing.ClientName</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group row">
+                        <label for="ReturnDate" class="col-md-4 col-form-label">Return Date</label>
+                        <div class="col-md-8">
+                            <input type="date" id="ReturnDate" name="ReturnDate" value="@ViewBag.ReturnDate.ToString("yyyy-MM-dd")" class="form-control" readonly>
+                            <input type="hidden" id="Status" name="Status" value="Pending" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="Reason" class="col-md-2 col-form-label">Reason</label>
+                        <div class="col-md-10">
+                            <textarea rows="3" id="Reason" name="Reason" class="form-control" title="Only letters allowed" placeholder="Optional"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="/Content/Util/slimselect.min.css" />
+<script src="https://unpkg.com/slim-select@latest/dist/slimselect.min.js"></script>
+<script type="module">
+    import SlimSelect from '/Scripts/Util/slimselect.es.min.js'
+    new SlimSelect({
+        select: '#ReleaseId',
+        settings: { searchPlaceholder: 'Search for the Releasing!' }
+    });
+
+    document.getElementById('Reason').addEventListener('input', function () {
+        var regex = /^[A-Za-z ]*$/;
+        var textareaValue = this.value;
+        if (!regex.test(textareaValue)) {
+            this.setCustomValidity('Only letters and spaces are allowed.');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+</script>

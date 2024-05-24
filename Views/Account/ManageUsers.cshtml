@@ -1,0 +1,78 @@
+﻿@if (User.IsInRole("wrhmgr") || User.IsInRole("salesmgr") || User.IsInRole("purchmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+
+@if (User.IsInRole("admin"))
+{
+    ViewBag.Title = "Manage User";
+
+    <div class="container-fluid">
+        <a href="/Account/Register" class="float-right btn btn-primary btn-lg btn-circle mb-3" style="display: flex; justify-content: center; align-items: center;">+</a>
+        <h2 class="text-center">@ViewBag.Title</h2>
+        <div class="table-responsive">
+            <table class="table table-hover text-nowrap table-bordered" id="myTable">
+                <thead>
+                    <tr>
+                        <th class="text-center">Username</th>
+                        <th class="text-center">Roles</th>
+                        <th class="text-center">Email</th>
+                        <th class="text-center">Created On</th>
+                        <th class="text-center">Last Login</th>
+                        <th class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var user in Model)
+                    {
+                        <tr>
+                            <td class="text-center">@user.UserName</td>
+                            <td class="text-center">
+                                @if (user.Roles.Contains("wrhmgr"))
+                                {
+                                    <span>Warehouse manager</span>
+                                }
+                                else if (user.Roles.Contains("admin"))
+                                {
+                                    <span>Admin</span>
+                                }
+                                else if (user.Roles.Contains("salesmgr"))
+                                {
+                                    <span>Releaser manager</span>
+                                }
+                                else if (user.Roles.Contains("purchmgr"))
+                                {
+                                    <span>Purchase manager</span>
+                                }
+                            </td>
+                            <td class="text-center">@user.Email</td>
+                            <td class="text-center">@user.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                            <td class="text-center">
+                                @if (user.LastLogin == null)
+                                {
+                                    <p>No history of login</p>
+                                }
+                                else
+                                {
+                                    @user.LastLogin.ToString("yyyy-MM-dd HH:mm:ss")
+                                }
+                            </td>
+                            <td class="text-center">
+                                @if (user.IsActive == false)
+                                {
+                                    <a href="/Account/Activate?username=@user.UserName" class="btn btn-warning btn-sm"
+                                       onclick="return confirm('Are you sure you want to activate @user.UserName?')">Activate</a>
+                                }
+                                @if (user.IsActive == true)
+                                {
+                                    <a href="/Account/Deactivate?username=@user.UserName" class="btn btn-danger btn-sm"
+                                       onclick="return confirm('Are you sure you want to deactivate @user.UserName?')">Deactivate</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

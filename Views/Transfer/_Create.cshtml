@@ -1,0 +1,98 @@
+﻿@model Dictionary<string, object>
+
+@{
+    var locations = Model["LocLookup"] as List<Location>;
+}
+
+<button type="button" class="btn btn-primary btn-circle btn-lg" data-toggle="modal" data-target="#addModal">+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="addModal" data-backdrop="static" data-keyboard="false" aria-labelledby="addModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <form action="/Transfer/Create" method="post" class="form-horizontal" autocomplete="off">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create Transfer</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @Html.AntiForgeryToken()
+                    <!-- Text input-->
+                    <div class="form-group row">
+                        <label for="TransferDate" class="col-md-4 col-form-label">Transfer Date</label>
+                        <div class="col-md-8">
+                            <input type="date" id="TransferDate" name="TransferDate" value="@ViewBag.TransferDate.ToString("yyyy-MM-dd")" class="form-control" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <select id="LocationId" name="LocationId" class="form-control" required="required">
+                            <option value="" selected disabled>Select Location</option>
+                            @foreach (var location in locations)
+                            {
+                                if (User.IsInRole("wrhmgr"))
+                                {
+                                    if (location.Id == 2)
+                                    {
+                                        <option value="@location.Id">From Warehouse to Main Store </option>
+                                    }
+                                }
+                                if (User.IsInRole("salesmgr"))
+                                {
+                                    if (location.Id == 1)
+                                    {
+                                        <option value="@location.Id">From Main Store to Warehouse</option>
+                                    }
+                                }
+                                if (User.IsInRole("admin"))
+                                {
+                                    if (location.Id == 1)
+                                    {
+                                        <option value="@location.Id">From Main Store to Warehouse</option>
+                                    }
+                                    if (location.Id == 2)
+                                    {
+                                        <option value="@location.Id">From Warehouse to Main Store </option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group row">
+                        <label for="Notes" class="col-md-4 col-form-label">Notes</label>
+                        <div class="col-md-8">
+                            <textarea rows="3" id="Notes" name="Notes" class="form-control" title="Only letters allowed" placeholder="Optional"></textarea>
+                            <input id="Status" name="Status" value="Not Transfer" type="hidden">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="/Content/Util/slimselect.min.css" />
+<script type="module">
+    import SlimSelect from '/Scripts/Util/slimselect.es.min.js'
+    new SlimSelect({
+        select: '#LocationId',
+        settings: { searchPlaceholder: 'Search for the Location!' }
+    });
+</script>
+
+<script>
+    document.getElementById('Notes').addEventListener('input', function () {
+        var regex = /^[A-Za-z ]*$/;
+        var textareaValue = this.value;
+        if (!regex.test(textareaValue)) {
+            this.setCustomValidity('Only letters and spaces are allowed.');
+        } else {
+            this.setCustomValidity('');
+        }
+    });
+</script>

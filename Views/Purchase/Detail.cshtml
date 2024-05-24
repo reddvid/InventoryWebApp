@@ -1,0 +1,31 @@
+﻿@model ASPNETWebApp48.Models.Purchase
+
+@if (User.IsInRole("wrhmgr") || User.IsInRole("salesmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+
+@if (User.IsInRole("purchmgr") || User.IsInRole("admin"))
+{
+    ViewBag.Title = "Purchase Detail - " + Model.Supplier.Name;
+
+    <div class="main-panel">
+        <div class="content-wrapper">
+            <center>
+                <h3 class="mt-3">Purchase Detail</h3><hr />
+                <h3>JIMAR CONSTRUCTION SUPPLY CO., LTD.</h3>
+                111-113 Gomez St. Cagayan De Oro City<br />
+                Tel. Nos. (08822) 72-60-25, 72-31-44, 72-32-96 Fax 72-38-84
+                <p>
+                    <hr />PO # : @Model.Id
+                    <hr />Order Date : @Model.OrderDate.ToString("yyyy-MM-dd")
+                    <hr />Supplier : @Model.Supplier.Name
+                    <hr />Total : ₱@Model.OrderTotal.ToString("N2")<hr />
+                </p>
+                <a href="/Purchase/Print/@Model.Id"><input type="button" class="btn btn-info btn-lg" value="Print"></a>&nbsp;
+                <a href="/Purchase/Send/@Model.Id" class="btn btn-lg btn-warning no-print">Send Email</a>&nbsp;
+                <a href="/Purchase/manage"><input type="button" class="btn btn-secondary btn-lg" value="Go back to List"></a>
+            </center>
+        </div>
+    </div>
+}

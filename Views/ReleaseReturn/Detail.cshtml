@@ -1,0 +1,32 @@
+﻿@model ASPNETWebApp48.Models.ReleaseReturn
+
+@if (User.IsInRole("wrhmgr") || User.IsInRole("purchmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+
+@if (User.IsInRole("admin") || User.IsInRole("salesmgr"))
+{
+    ViewBag.Title = "Invoice Detail | " + Model.Releasing.ClientName;
+
+    <div class="main-panel">
+        <div class="content-wrapper">
+            <center>
+                <br />
+                <h3>JIMAR CONSTRUCTION SUPPLY CO., LTD.</h3>
+                111-113 Gomez St. Cagayan De Oro City<br />
+                Tel. Nos. (08822) 72-60-25, 72-31-44, 72-32-96 Fax 72-38-84
+                <br /><br /><h3>Release Return Detail</h3>
+                <p>
+                    <hr />Release # : @Model.Id
+                    <hr />Name : @Model.Releasing.ClientName
+                    <hr />Date : @Model.ReturnDate.ToString("yyyy-MM-dd")
+                    <hr />Status : @Model.Status
+                    <hr />Reason : @Model.Reason<hr />
+                </p>
+                <a href="/ReleaseReturn/Print/@Model.Id"><input type="button" class="btn btn-info btn-lg" value="Print"></a>&nbsp;
+                <a href="/ReleaseReturn/ManageApproval"><input type="button" class="btn btn-secondary btn-lg" value="Back to Manage"></a>
+            </center>
+        </div>
+    </div>
+}

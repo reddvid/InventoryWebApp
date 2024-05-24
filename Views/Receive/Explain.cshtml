@@ -1,0 +1,50 @@
+﻿@model ASPNETWebApp48.Models.Receiving
+
+@if (User.IsInRole("purchmgr") || User.IsInRole("salesmgr"))
+{
+    <h3 class="text-center">@ViewBag.Message</h3>
+}
+
+@if (User.IsInRole("wrhmgr") || User.IsInRole("admin"))
+{
+    ViewBag.Title = "Explain - " + Model.Supplier.Name;
+
+    <div class="container-fluid">
+        <h2 class="col-12 col-md-8 text-center">@ViewBag.Title</h2>
+        <form action="/Receive/Pending" method="post" class="form-horizontal mt-3">
+            @Html.AntiForgeryToken()
+            <div class="form-group row">
+                <label for="Reason" class="col-sm-2 col-form-label text-center zoom-3">Reason</label>
+                <div class="col-sm-10">
+                    <textarea id="Reason" name="Reason" required="required" class="form-control" rows="4"></textarea>
+                    <input type="hidden" name="ReceiveDate" value="@Model.ReceiveDate.ToString("yyyy-MM-dd")" id="ReceiveDate" readonly>
+                    <input type="hidden" name="Id" value="@Model.Id" id="Id">
+                    <input type="hidden" name="PurchaseNo" value="@Model.PurchaseNo" id="PurchaseNo">
+                    <input type="hidden" name="PurchaseId" value="@Model.PurchaseId" id="PurchaseId">
+                    <input type="hidden" name="SupplierId" value="@Model.SupplierId" id="SupplierId">
+                    <input type="hidden" name="LocationId" value="@Model.LocationId" id="LocationId">
+                </div>
+            </div>
+            <!-- Button -->
+            <div class="form-group row">
+                <label class="col-sm-2"></label>
+                <div class="col-sm-10">
+                    <a href="/Receive/ViewDetail/@Model.Id" class="btn btn-secondary btn-lg">Back</a>
+                    <button type="submit" class="btn btn-primary btn-lg">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('Reason').addEventListener('input', function () {
+            var regex = /^[A-Za-z ]*$/;
+            var inputValue = this.value;
+            if (!regex.test(inputValue)) {
+                this.setCustomValidity('Only letters and spaces are allowed.');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    </script>
+}
